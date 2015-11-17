@@ -1,0 +1,35 @@
+{
+  "name": "nux",
+  "version": "0.1.0",
+  "description": "A functional reactive web framework utilizing redux.js, immutable.js, and virtual-dom.js",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "'"
+  },
+  "keywords": [
+    "immutable",
+    "redux",
+    "flux",
+    "functional-reactive",
+    "functional"
+  ],
+  "dependencies": {
+    "dom-delegator": "^13.1.0",
+    "immutable": "^3.7.5",
+    "redux": "^3.0.4",
+    "virtual-dom": "^2.1.1"
+  },
+  "devDependencies": {
+    "babelify": "~5.0.3",
+    "browser-sync": "^1.7.1",
+    "browserify": "^6.3.3",
+    "gulp": "~3.9.0",
+    "gulp-rename": "^1.2.0",
+    "lodash": "^2.4.1",
+    "rimraf": "~2.2.8",
+    "watchify": "^2.1.1",
+    "vinyl-source-stream": "^1.0.0"
+  },
+  "author": "Mark Nutter <marknutter@gmail.com>",
+  "license": "ISC"
+}
