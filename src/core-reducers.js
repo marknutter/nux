@@ -22,13 +22,12 @@ export function createPost(state, title) {
   const sortedPosts = newPosts.sortBy((val, key) => {
                         return parseInt(key.split("#")[1]);
                       }, (keyA, keyB) => {
-                        return keyA < keyB;
+                        return keyA < keyB ? 1 : -1;
                       });
   return state.setIn(postsPathArray, sortedPosts);
 }
 
 export function loadInitialUI(state) {
-  console.log('fromJS', fromJS)
   const ui = fromJS(initialUI());
   return state.set('ui', ui);
 }

@@ -1,6 +1,6 @@
 import h from 'virtual-dom/h';
 import getStore from './store';
-import {fromJS, Map, List} from 'immutable';
+import {fromJS, Map, List, Iterable} from 'immutable';
 
 let store = getStore();
 
@@ -128,5 +128,9 @@ export function renderUI (ui, space = "") {
 };
 
 export function initialUI() {
-  return fromJS(ui);
+  return fromJS(ui, function (key, value) {
+    var isIndexed = Iterable.isIndexed(value);
+    return isIndexed ? value.toList() : value.toOrderedMap();
+  });
+  // return fromJS(ui);
 }
