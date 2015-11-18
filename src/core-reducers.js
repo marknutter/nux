@@ -4,17 +4,20 @@ import {List, Map, fromJS, Seq} from 'immutable';
 import ui from './ui';
 
 export function createPost(state, title) {
-  let newPost = List(['div',
-    {
+  let newPost = fromJS({
+    props: {
       style: {
         display: 'block',
         padding: '20px'
       }
     },
-    title
-  ]);
-  const newPosts = state.getIn(['ui','2','1','2','1','2']).push(newPost);
-  return state.setIn(['ui','2','1','2','1','2'], newPosts);
+    children: {
+      '$text': title
+    }
+  });
+  const postsPathArray = ['ui', 'div#app', 'children', 'div#posts', 'children', 'div#posts-container', 'children'];
+  const posts = state.getIn(postsPathArray);
+  return state.setIn(postsPathArray.concat([`div#${posts.size}`]), newPost);
 }
 
 export function loadInitialUI(state) {
