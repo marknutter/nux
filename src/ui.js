@@ -124,7 +124,6 @@ export function renderUI (ui, space = "") {
     }
     return [key, val.get('props').toJS(), children.toList().toJS()];
   });
-  console.log("node", node.toList().toJS()[0])
   return h.apply(this, node.toList().toJS()[0]);
 };
 

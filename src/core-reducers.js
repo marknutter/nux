@@ -17,7 +17,14 @@ export function createPost(state, title) {
   });
   const postsPathArray = ['ui', 'div#app', 'children', 'div#posts', 'children', 'div#posts-container', 'children'];
   const posts = state.getIn(postsPathArray);
-  return state.setIn(postsPathArray.concat([`div#${posts.size}`]), newPost);
+  const tag = `div#${posts.size}`;
+  const newPosts = posts.set(tag, newPost);
+  const sortedPosts = newPosts.sortBy((val, key) => {
+                        return parseInt(key.split("#")[1]);
+                      }, (keyA, keyB) => {
+                        return keyA < keyB;
+                      });
+  return state.setIn(postsPathArray, sortedPosts);
 }
 
 export function loadInitialUI(state) {
