@@ -1,4 +1,9 @@
-# nux
+                   
+     __  _ __ ____  __
+    |  \| |  |  \ \/ /
+    |_|\__|\___//_/\_\
+                   
+
 An Immutable Web Framework
 
 "What a framework! What a lovely framework!!"
