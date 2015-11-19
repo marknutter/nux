@@ -1,8 +1,7 @@
 import h from 'virtual-dom/h';
-import getStore from './store';
+import {getStore} from './store';
 import {fromJS, Map, List, Iterable} from 'immutable';
 
-let store = getStore();
 
 
 let ui = {
@@ -28,10 +27,10 @@ let ui = {
           }
         },
         children: {
-          '$text': 'Oqodo'
+          '$text': 'Nux Todos'
         }
       },
-      'div#posts': {
+      'div#todos': {
         props: {
           style: {
             position: 'absolute',
@@ -43,7 +42,7 @@ let ui = {
           }
         },
         children: {
-          'form#new-post-form': {
+          'form#new-todo-form': {
             props: {
               style: {
                 position: 'absolute',
@@ -54,8 +53,8 @@ let ui = {
                 e.preventDefault();
                 const title = e.target.querySelector('input').value;
                 e.target.querySelector('input').value = '';
-                store.dispatch({
-                  type: 'CREATE_POST',
+                getStore().dispatch({
+                  type: 'CREATE_TODO',
                   title: title
                 });
               },
@@ -68,12 +67,12 @@ let ui = {
                     fontSize: '16px',
                     padding: '5px'
                   },
-                  placeholder: 'add new post'
+                  placeholder: 'add new todo'
                 }
               }
             }
           },
-          'div#posts-container': {
+          'div#todo-container': {
             props: {
               style: {
                 position: 'absolute',
@@ -90,28 +89,9 @@ let ui = {
 };
 
 
-
-// export function renderUI (ui, space = "") {
-//   let node;
-//   if (ui.map) {
-//     node = ui.map((arg) => {
-//       if (List.isList(arg)) {
-//         return arg.map((n) => {
-//           return renderUI(n, space + "  ");
-//         });
-//       } else {
-//         return arg.toJS ? arg.toJS() : arg;
-//       }
-//     }).toJS()
-//   } else {
-//     node = [ui];
-//   };
-//   return h.apply(this, node);
-// };
-
 export function renderUI (ui, space = "") {
   let node = ui.map((val, key) => {
-
+    let nodeArray = [key];
     let children = new List();
     if (val.get('children')) {
       children = val.get('children').map((val, key) => {
@@ -122,15 +102,23 @@ export function renderUI (ui, space = "") {
         }
       });
     }
-    return [key, val.get('props').toJS(), children.toList().toJS()];
+    if (val.get('props')) {
+      nodeArray.push(val.get('props').toJS());
+    }
+    nodeArray.push(children.toList().toJS());
+    return nodeArray;
   });
   return h.apply(this, node.toList().toJS()[0]);
 };
 
 export function initialUI() {
+
+  // if (localStorage.getItem('todos')) {
+  //   ui = JSON.parse(localStorage.getItem('todos'));
+  // };
+
   return fromJS(ui, function (key, value) {
     var isIndexed = Iterable.isIndexed(value);
     return isIndexed ? value.toList() : value.toOrderedMap();
   });
-  // return fromJS(ui);
 }

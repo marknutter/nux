@@ -1,8 +1,12 @@
 import {createStore, compose} from 'redux';
-import reducer from './reducer';
 
-let store = createStore(reducer);
+let store;
 
-export default function() {
+export function getStore() {
+  return store;
+}
+
+export function initStore(reducer) {
+  store = createStore(reducer);
   return store;
 }

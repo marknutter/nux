@@ -4,23 +4,25 @@ import patch from 'virtual-dom/patch';
 import createElement from 'virtual-dom/create-element';
 import delegator from 'dom-delegator';
 import {renderUI} from './ui';
-import getStore from './store';
+import {initStore} from './store';
+import reducer from './reducer';
+import {List, Map, fromJS, Seq} from 'immutable';
 
-let store = getStore();
+let store = initStore(reducer);
 let d = delegator();
 
 let currentUI = h('div', 'loading...');
+
 let rootNode = createElement(currentUI);
 
 document.body.appendChild(rootNode);
 
 store.subscribe(() => {
-
-  var newUI = renderUI(store.getState().get('ui'));
-  // debugger
+  const ui = store.getState().get('ui');
+  // localStorage.setItem('todos', JSON.stringify(ui.toJS()));
+  var newUI = renderUI(ui);
   var patches = diff(currentUI, newUI);
   rootNode = patch(rootNode, patches);
-
   currentUI = newUI;
 });
 
@@ -28,3 +30,4 @@ store.subscribe(() => {
 store.dispatch({
   type: 'LOAD_INITIAL_UI'
 });
+
