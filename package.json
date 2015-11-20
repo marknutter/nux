@@ -13,6 +13,11 @@
     "functional-reactive",
     "functional"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marknutter/nux.git"
+  },
+  "homepage": "https://github.com/ashleygwilliams/my_package",
   "dependencies": {
     "dom-delegator": "^13.1.0",
     "immutable": "^3.7.5",
