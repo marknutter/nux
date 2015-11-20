@@ -23,8 +23,9 @@ export function submitTodo(state) {
   return updateInputValue(state, '', titleInputPathArray).setIn(todosPathArray, sortedTodos);
 }
 
-export function toggleTodo(state, tag, checked) {
-  if (checked) {
+export function toggleTodo(state, tag) {
+  const checked = state.getIn(todosPathArray.concat([tag, 'children', 'input', 'props', 'checked']));
+  if (checked === undefined) {
     const newState = state.setIn(todosPathArray.concat([tag, 'children', 'input', 'props', 'checked']), 'checked');
     return newState.setIn(todosPathArray.concat([tag, 'children', 'span.title', 'props', 'style', 'textDecoration']), 'line-through');
   } else {

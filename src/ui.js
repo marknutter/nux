@@ -109,7 +109,7 @@ export function renderUI (ui, pathArray = List()) {
           getStore().dispatch(val.get('dispatch').toJS());
         });
         return newProps
-      }, props).delete('events');
+      }, props);
       nodeArray.push(propsWithCustomEvents.toJS());
     } else {
       nodeArray.push(props.toJS());

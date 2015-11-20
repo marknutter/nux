@@ -17,12 +17,13 @@ export function todoFactory(title, tag) {
             position: 'relative'
           },
           type: 'checkbox',
-          'ev-click': (e) => {
-            const checked = e.target.checked;
-            getStore().dispatch({
-              type: `${checked ? '' : 'UN'}COMPLETE_TODO`,
-              tag: tag
-            });
+          events: {
+            'ev-change': {
+              dispatch: {
+                type: 'TOGGLE_TODO',
+                tag: tag
+              }
+            }
           }
         }
       },

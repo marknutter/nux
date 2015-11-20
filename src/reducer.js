@@ -14,11 +14,8 @@ export default function reducer(state = Map(), action) {
     case 'LOAD_INITIAL_UI':
       nextState = loadInitialUI(state);
       break;
-    case 'COMPLETE_TODO':
-      nextState = toggleTodo(state, action.tag, true);
-      break;
-    case 'UNCOMPLETE_TODO':
-      nextState = toggleTodo(state, action.tag, false);
+    case 'TOGGLE_TODO':
+      nextState = toggleTodo(state, action.tag);
       break;
     case 'UPDATE_INPUT_VALUE':
       nextState = updateInputValue(state, action.val, action.pathArray);
