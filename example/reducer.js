@@ -1,5 +1,12 @@
+
 import {Map} from 'immutable';
 import {submitTodo, loadInitialUI, toggleTodo, updateInputValue} from './core-reducers';
+import {init} from './../lib/index';
+import reducer from './reducer';
+import {ui} from './core-ui'
+
+
+init(reducer, ui);
 
 
 export default function reducer(state = Map(), action) {
