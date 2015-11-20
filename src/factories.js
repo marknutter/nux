@@ -1,5 +1,4 @@
 import {List, Map, fromJS, Seq} from 'immutable';
-import {getStore} from './store';
 
 export function todoFactory(title, tag) {
   return fromJS({

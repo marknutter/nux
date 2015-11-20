@@ -1,8 +1,5 @@
-import {fromJS, Map} from 'immutable';
-import {initialUI} from './ui';
+import {Map} from 'immutable';
 import {submitTodo, loadInitialUI, toggleTodo, updateInputValue} from './core-reducers';
-
-window.appStates = [];
 
 
 export default function reducer(state = Map(), action) {
@@ -12,7 +9,7 @@ export default function reducer(state = Map(), action) {
       nextState = submitTodo(state, action.title);
       break;
     case 'LOAD_INITIAL_UI':
-      nextState = loadInitialUI(state);
+      nextState = loadInitialUI(state, action.ui);
       break;
     case 'TOGGLE_TODO':
       nextState = toggleTodo(state, action.tag);
@@ -38,5 +35,4 @@ NEW STATE      `, nextStateJS, `
 PREVIOUS STATE `, prevState.toJS(), `
 ----------------------------------------------------------------`
   );
-  window.appStates.push(nextStateJS);
 }
