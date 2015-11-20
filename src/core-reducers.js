@@ -35,7 +35,7 @@ export function toggleTodo(state, tag) {
 }
 
 export function loadInitialUI(state) {
-  const ui = fromJS(initialUI());
+  const ui = fromJS(state.ui);
   return state.set('ui', ui);
 }
 
@@ -43,12 +43,3 @@ export function updateInputValue(state, val, pathArray) {
   return state.setIn(pathArray.concat(['props', 'value']), val);
 }
 
-// (e) => {
-//   e.preventDefault();
-//   const title = e.target.querySelector('input').value;
-//   e.target.querySelector('input').value = '';
-//   getStore().dispatch({
-//     type: 'CREATE_TODO',
-//     title: title
-//   });
-// }
