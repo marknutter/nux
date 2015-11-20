@@ -6,12 +6,16 @@ export function todoFactory(title, tag) {
     props: {
       style: {
         display: 'block',
-        padding: '20px'
+        padding: '5px'
       }
     },
     children: {
       'input': {
         props: {
+          style: {
+            top: '-1px',
+            position: 'relative'
+          },
           type: 'checkbox',
           'ev-click': (e) => {
             const checked = e.target.checked;
@@ -23,6 +27,11 @@ export function todoFactory(title, tag) {
         }
       },
       'span.title': {
+        props: {
+          style: {
+            marginLeft: '10px'
+          },
+        },
         children: {
           '$text': title
         }

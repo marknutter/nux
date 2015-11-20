@@ -1,6 +1,6 @@
 import {fromJS, Map} from 'immutable';
 import {initialUI} from './ui';
-import {createTodo, loadInitialUI, toggleTodo} from './core-reducers';
+import {submitTodo, loadInitialUI, toggleTodo, updateInputValue} from './core-reducers';
 
 window.appStates = [];
 
@@ -8,16 +8,27 @@ window.appStates = [];
 export default function reducer(state = Map(), action) {
   let nextState;
   switch (action.type) {
-  case 'CREATE_TODO':
-    return storeAndLogState(action, createTodo(state, action.title), state);
-  case 'LOAD_INITIAL_UI':
-    return storeAndLogState(action, loadInitialUI(state), state);
-  case 'COMPLETE_TODO':
-    return storeAndLogState(action, toggleTodo(state, action.tag, true), state);
-  case 'UNCOMPLETE_TODO':
-    return storeAndLogState(action, toggleTodo(state, action.tag, false), state);
+    case 'SUBMIT_TODO':
+      nextState = submitTodo(state, action.title);
+      break;
+    case 'LOAD_INITIAL_UI':
+      nextState = loadInitialUI(state);
+      break;
+    case 'COMPLETE_TODO':
+      nextState = toggleTodo(state, action.tag, true);
+      break;
+    case 'UNCOMPLETE_TODO':
+      nextState = toggleTodo(state, action.tag, false);
+      break;
+    case 'UPDATE_INPUT_VALUE':
+      nextState = updateInputValue(state, action.val, action.pathArray);
+      break;
+    default:
+      nextState = state;
+      break;
   }
-  return state;
+  storeAndLogState(action, nextState, state);
+  return nextState;
 }
 
 
@@ -31,5 +42,4 @@ PREVIOUS STATE `, prevState.toJS(), `
 ----------------------------------------------------------------`
   );
   window.appStates.push(nextStateJS);
-  return nextState;
 }

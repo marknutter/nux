@@ -19,7 +19,7 @@ document.body.appendChild(rootNode);
 
 store.subscribe(() => {
   const ui = store.getState().get('ui');
-  // localStorage.setItem('todos', JSON.stringify(ui.toJS()));
+  localStorage.setItem('todos', JSON.stringify(ui.toJS()));
   var newUI = renderUI(ui);
   var patches = diff(currentUI, newUI);
   rootNode = patch(rootNode, patches);
