@@ -1,7 +1,5 @@
 import h from 'virtual-dom/h';
-import {initialUI} from './ui';
-import {List, Map, fromJS, Seq} from 'immutable';
-import ui from './ui';
+import {List, Map, fromJS, Seq, Iterable} from 'immutable';
 import {todoFactory} from './factories';
 
 const todosPathArray = ['ui', 'div#app', 'children', 'div#todos', 'children', 'div#todo-container', 'children'];
@@ -34,8 +32,12 @@ export function toggleTodo(state, tag) {
   }
 }
 
-export function loadInitialUI(state) {
-  const ui = fromJS(state.ui);
+export function loadInitialUI(state, ui) {
+
+  const ui = fromJS(ui, function (key, value) {
+    var isIndexed = Iterable.isIndexed(value);
+    return isIndexed ? value.toList() : value.toOrderedMap();
+  });
   return state.set('ui', ui);
 }
 

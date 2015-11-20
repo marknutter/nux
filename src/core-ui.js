@@ -1,4 +1,4 @@
-const ui = {
+export const ui = {
   'div#app': {
     props: {
       style: {
@@ -80,4 +80,4 @@ const ui = {
   }
 };
 
-export const ui;
+

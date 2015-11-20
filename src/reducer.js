@@ -9,7 +9,7 @@ export default function reducer(state = Map(), action) {
       nextState = submitTodo(state, action.title);
       break;
     case 'LOAD_INITIAL_UI':
-      nextState = loadInitialUI(state);
+      nextState = loadInitialUI(state, action.ui);
       break;
     case 'TOGGLE_TODO':
       nextState = toggleTodo(state, action.tag);
