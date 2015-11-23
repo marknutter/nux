@@ -1,4 +1,4 @@
-export const ui = {
+export const todoUi = {
   'div#app': {
     props: {
       style: {
