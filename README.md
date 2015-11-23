@@ -18,7 +18,7 @@ An Immutable Web Framework
 - [ ] add jsdoc comments to nux core
 - [ ] write tests for example app
 - [ ] write tests for nux core
-- [ ] rename and organize files in example to provide best practices
+- [x] rename and organize files in example to provide best practices
 - [ ] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
 - [ ] change src/ to example/ and update gruntFile.js accordingly
 - [ ] create nux reducer that auto-logs and provides baked-in framework specific actions
