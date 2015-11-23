@@ -10,9 +10,9 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 
 var config = {
-  entryFile: './src/app.js',
-  outputDir: './dist/',
-  outputFile: 'app.js'
+  entryFile: './example/todo-app.js',
+  outputDir: './example/dist/',
+  outputFile: 'todo-app.js'
 };
 
 // clean the output directory
@@ -50,7 +50,7 @@ gulp.task('watch', ['build-persistent'], function() {
 
   browserSync({
     server: {
-      baseDir: './'
+      baseDir: './example/'
     }
   });
 
@@ -63,7 +63,7 @@ gulp.task('watch', ['build-persistent'], function() {
 gulp.task('serve', function () {
   browserSync({
     server: {
-      baseDir: './'
+      baseDir: './example/'
     }
   });
 });

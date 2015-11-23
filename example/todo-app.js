@@ -1,12 +1,12 @@
 
 import {Map} from 'immutable';
-import {submitTodo, loadInitialUI, toggleTodo, updateInputValue} from './core-reducers';
+import {submitTodo, loadInitialUI, toggleTodo, updateInputValue} from './todo-reducers';
 import {init} from './../lib/index';
-import reducer from './reducer';
-import {ui} from './core-ui'
+
+import {ui} from './todo-ui'
 
 
-init(reducer, ui);
+
 
 
 export default function reducer(state = Map(), action) {
@@ -43,3 +43,7 @@ PREVIOUS STATE `, prevState.toJS(), `
 ----------------------------------------------------------------`
   );
 }
+
+
+
+init(reducer, ui);

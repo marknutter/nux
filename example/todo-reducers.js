@@ -1,6 +1,6 @@
 import h from 'virtual-dom/h';
 import {List, Map, fromJS, Seq, Iterable} from 'immutable';
-import {todoFactory} from './factories';
+import {todoFactory} from './todo-factories';
 
 const todosPathArray = ['ui', 'div#app', 'children', 'div#todos', 'children', 'div#todo-container', 'children'];
 
