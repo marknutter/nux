@@ -4,7 +4,7 @@
     |_|\__|\___//_/\_\
 
 
-An Immutable Web Framework
+A Pure Functional Reactive Web UI Library
 
 "What a framework! What a lovely framework!!"
 
