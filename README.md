@@ -16,9 +16,11 @@ A Pure Functional Reactive Web UI Library
 - [x] rename and organize files in example to provide best practices
 - [x] change src/ to example/ and update gruntFile.js accordingly
 - [x] create nux reducer that auto-logs and provides baked-in framework specific actions
-- [ ] convert todo example app, or create an additional example app to be a todoMVC app following their guidelines
+- [ ] write tests for nux core
+- [ ] write tests for example app
+- [ ] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
+- [ ] create nux events that mirror DOM events and add new events such as changes to a particular node in the vdom
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
 - [ ] add jsdoc comments to nux core
-- [ ] write tests for example app
-- [ ] write tests for nux core
-- [ ] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
+- [ ] convert todo example app, or create an additional example app to be a todoMVC app following their guidelines
+- [ ] add options to init() that allow toggling of action logs and localStorage persistence

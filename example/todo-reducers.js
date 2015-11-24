@@ -34,11 +34,11 @@ export function toggleTodo(state, tag) {
 
 export function loadInitialUI(state, ui) {
 
-  const ui = fromJS(ui, function (key, value) {
+  const newUi = fromJS(ui, function (key, value) {
     var isIndexed = Iterable.isIndexed(value);
     return isIndexed ? value.toList() : value.toOrderedMap();
   });
-  return state.set('ui', ui);
+  return state.set('ui', newUi);
 }
 
 export function updateInputValue(state, val, pathArray) {

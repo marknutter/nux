@@ -30,10 +30,17 @@
     "browserify": "^6.3.3",
     "gulp": "~3.9.0",
     "gulp-rename": "^1.2.0",
+    "karma": "^0.12.28",
+    "karma-babel-preprocessor": "^5.2.1",
+    "karma-browserify": "^4.4.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-sourcemap-loader": "^0.3.5",
     "lodash": "^2.4.1",
     "rimraf": "~2.2.8",
-    "watchify": "^2.1.1",
-    "vinyl-source-stream": "^1.0.0"
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.1.1"
   },
   "author": "Mark Nutter <marknutter@gmail.com>",
   "license": "ISC"
