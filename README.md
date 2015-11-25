@@ -24,3 +24,4 @@ A Pure Functional Reactive Web UI Library
 - [ ] add jsdoc comments to nux core
 - [ ] convert todo example app, or create an additional example app to be a todoMVC app following their guidelines
 - [ ] add options to init() that allow toggling of action logs and localStorage persistence
+- [ ] add fancy styling to action logger
