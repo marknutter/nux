@@ -35,6 +35,7 @@ module.exports = function(config) {
 
     browserify: {
       debug: true,
+      plugin: ['proxyquire-universal'],
       transform: [
         ['babelify']
       ]
