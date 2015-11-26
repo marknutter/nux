@@ -1,8 +1,4 @@
-
-     __  _ __ ____  __
-    |  \| |  |  \ \/ /
-    |_|\__|\___//_/\_\
-
+![NUX](http://i.imgur.com/vZHsn0E.png)
 
 A Pure Functional Reactive Web UI Library
 
