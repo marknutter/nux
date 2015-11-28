@@ -4,14 +4,27 @@
   "description": "A functional reactive web framework utilizing redux.js, immutable.js, and virtual-dom.js",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start karma.conf.js"
+    "test": "./node_modules/.bin/karma start karma.conf.js",
+    "generate-docs": "./node_modules/.bin/jsdoc yourJavaScriptFile.js"
   },
   "keywords": [
     "immutable",
     "redux",
     "flux",
     "functional-reactive",
-    "functional"
+    "functional",
+    "reactive",
+    "virtual-dom",
+    "state-machine",
+    "reducer",
+    "state",
+    "predictable",
+    "elm",
+    "ohm",
+    "mercury",
+    "hyperscript",
+    "flux",
+    "isomorphic"
   ],
   "repository": {
     "type": "git",
@@ -30,6 +43,7 @@
     "browserify": "^6.3.3",
     "gulp": "~3.9.0",
     "gulp-rename": "^1.2.0",
+    "jsdoc": "^3.4.0",
     "karma": "^0.12.28",
     "karma-babel-preprocessor": "^5.2.1",
     "karma-browserify": "^4.4.0",
