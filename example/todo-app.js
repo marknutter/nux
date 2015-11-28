@@ -1,5 +1,3 @@
-
-import {Map} from 'immutable';
 import {submitTodo, toggleTodo} from './todo-reducers';
 import {init} from './../lib/index';
 import {todoUi} from './todo-ui'
