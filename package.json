@@ -5,7 +5,7 @@
   "main": "gulpfile.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma.conf.js",
-    "generate-docs": "./node_modules/.bin/jsdoc yourJavaScriptFile.js"
+    "generate-docs": "./node_modules/.bin/jsdoc ./lib/*.js --destination ./docs/"
   },
   "keywords": [
     "immutable",
