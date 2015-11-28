@@ -6,8 +6,12 @@ describe('the Nux store', () => {
 
   it('should allow the initilization and retrieval of a Redux store', () => {
     testStore = initStore(() => {});
-    expect(testStore).toEqual('');
-    expect(getStore()).toBe(testStore);
+    expect(getStore()).toEqual({
+      dispatch: jasmine.any(Function),
+      subscribe: jasmine.any(Function),
+      getState: jasmine.any(Function),
+      replaceReducer: jasmine.any(Function)
+    });
   });
 
 });
