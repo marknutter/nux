@@ -1,47 +1,31 @@
-import h from 'virtual-dom/h';
-import {List, Map, fromJS, Seq, Iterable} from 'immutable';
-import {todoFactory} from './todo-factories';
+import {todoComponent} from './todo-component';
+import {selector} from './../lib/utils';
 
-const todosPathArray = ['ui', 'div#app', 'children', 'div#todos', 'children', 'div#todo-container', 'children'];
+const todosPathArray = ['div#app div#todos div#todo-container children'];
 
 export function submitTodo(state) {
-  const todos = state.getIn(todosPathArray);
+  const todos = state.getIn(selector('div#app div#todos div#todo-container children'));
   const tag = `div#${todos.size}`;
+  const title = state.getIn(selector('div#app div#todos form#new-todo-form input props value'));
 
-  const titleInputPathArray = ['ui', 'div#app', 'children', 'div#todos', 'children', 'form#new-todo-form', 'children', 'input']
-  const title = state.getIn(titleInputPathArray.concat(['props', 'value']));
-
-  let newTodo = todoFactory(title, tag);
+  let newTodo = todoComponent(title, tag);
   const newTodos = todos.set(tag, newTodo);
   const sortedTodos = newTodos.sortBy((val, key) => {
                         return parseInt(key.split("#")[1]);
                       }, (keyA, keyB) => {
                         return keyA < keyB ? 1 : -1;
                       });
-  return updateInputValue(state, '', titleInputPathArray).setIn(todosPathArray, sortedTodos);
+  return state.setIn(selector('div#app div#todos form#new-todo-form input props value'), '')
+              .setIn(selector('div#app div#todos div#todo-container children'), sortedTodos);
 }
 
 export function toggleTodo(state, tag) {
-  const checked = state.getIn(todosPathArray.concat([tag, 'children', 'input', 'props', 'checked']));
+  const checked = state.getIn(selector(`div#app div#todos div#todo-container ${tag} input props checked`));
   if (checked === undefined) {
-    const newState = state.setIn(todosPathArray.concat([tag, 'children', 'input', 'props', 'checked']), 'checked');
-    return newState.setIn(todosPathArray.concat([tag, 'children', 'span.title', 'props', 'style', 'textDecoration']), 'line-through');
+    const newState = state.setIn(selector(`div#app div#todos div#todo-container ${tag} input props checked`), 'checked');
+    return newState.setIn(selector(`div#app div#todos div#todo-container ${tag} span.title props style textDecoration`), 'line-through');
   } else {
-    const newState = state.deleteIn(todosPathArray.concat([tag, 'children', 'input', 'props', 'checked']));
-    return newState.deleteIn(todosPathArray.concat([tag, 'children', 'span.title', 'props', 'style', 'textDecoration']));
+    const newState = state.deleteIn(selector(`div#app div#todos div#todo-container ${tag} input props checked`));
+    return newState.deleteIn(selector(`div#app div#todos div#todo-container ${tag} span.title props style textDecoration`));
   }
 }
-
-export function loadInitialUI(state, ui) {
-
-  const newUi = fromJS(ui, function (key, value) {
-    var isIndexed = Iterable.isIndexed(value);
-    return isIndexed ? value.toList() : value.toOrderedMap();
-  });
-  return state.set('ui', newUi);
-}
-
-export function updateInputValue(state, val, pathArray) {
-  return state.setIn(pathArray.concat(['props', 'value']), val);
-}
-
