@@ -19,4 +19,4 @@ init((state, action) => {
       break;
   }
   return nextState;
-}, todoUi);
+}, todoUi, {localStorage: true, logActions: true});
