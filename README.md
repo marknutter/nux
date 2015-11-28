@@ -60,7 +60,7 @@ init((state, action) => {
 - [x] create nux reducer that auto-logs and provides baked-in framework specific actions
 - [x] write tests for nux core
 - [x] add options to init() that allow toggling of action logs and localStorage persistence
-- [ ] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
+- [x] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
 - [ ] build out nux events that mirror common DOM events following pattern used for ev-input
 - [ ] add jsdoc comments to nux core
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
