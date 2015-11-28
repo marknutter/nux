@@ -6,7 +6,7 @@ Nux combines [redux](http://redux.js.org), [virtual-dom](https://github.com/Matt
 
 ###Example
 
-```
+```js
 import init from 'nux';
 
 init((state, action) => {
@@ -38,7 +38,7 @@ init((state, action) => {
           }
         },
         children: {
-          input: {
+          'input': {
             props: {
               placeholder: 'say something..'
             }
