@@ -55,46 +55,6 @@ describe('the Nux core reducer, when provided a separate reducer,', () => {
 
   describe('when handling the core action', () => {
 
-    describe('_LOAD_INITIAL_UI,', () => {
-      const initialState = {
-        'div#app': {
-          props: {
-            style: {
-              fontFamily: 'helvetica'
-            }
-          },
-          children: {
-            'h1': {
-              props: {
-                style: {
-                  fontSize: '20px'
-                }
-              }
-            }
-          }
-        }
-      };
-      let action, newState;
-
-      beforeEach(() => {
-        action = {
-          type: '_LOAD_INITIAL_UI',
-          ui: initialState
-        }
-        newState = testReducer(Map(), action);
-      })
-
-
-      it ("should return a new state that is an immutable version of the given object at the root node 'ui'", () => {
-        expect(newState.toJS()).toEqual({ui: initialState});
-      });
-
-      it ("should return a new state with all nested objects converted into OrderedMaps", () => {
-        expect(OrderedMap.isOrderedMap(newState.getIn(['ui', 'div#app', 'children']))).toBe(true);
-      });
-
-    });
-
     describe('_UPDATE_INPUT_VALUE,', () => {
       const initialState = fromJS({
         'input': {

@@ -1,6 +1,6 @@
-import {List, Map, fromJS, Seq} from 'immutable';
+import {fromJS} from 'immutable';
 
-export function todoFactory(title, tag) {
+export function todoComponent(title, tag) {
   return fromJS({
     props: {
       style: {

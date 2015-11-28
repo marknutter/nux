@@ -38,6 +38,7 @@ describe('the Nux init function', () => {
     localStorage.setItem = jasmine.createSpy('setItem');
     localStorage.getItem = jasmine.createSpy('getItem');
     var testApp = init(testReducer, {}, {localStorage: true});
+    testApp.dispatch({type: 'FOO'});
     expect(localStorage.setItem).toHaveBeenCalledWith('nux', JSON.stringify({}));
     expect(localStorage.getItem).toHaveBeenCalledWith('nux');
   });
