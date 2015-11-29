@@ -10,6 +10,8 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var karma = require('karma').server;
 var uglify = require('gulp-uglify');
+var streamify = require('gulp-streamify');
+var rename = require("gulp-rename");
 
 var config = {
   exampleEntryFile: './example/todo-app.js',
@@ -22,32 +24,27 @@ var config = {
 
 // clean the output directory
 gulp.task('clean', function(cb){
-    rimraf(config.outputDir, cb);
+    rimraf(config.exampleOutputDir, cb);
 });
 
 var bundler;
-function getBundler(prefix) {
+function getBundler() {
   if (!bundler) {
-    bundler = watchify(browserify(config[prefix+'EntryFile'], _.extend({ debug: true }, watchify.args)));
+    bundler = watchify(browserify(config.exampleEntryFile, _.extend({ debug: true }, watchify.args)));
   }
   return bundler;
 };
 
 function bundle(prefix) {
-  return getBundler(prefix)
+  return getBundler()
     .transform(babelify)
     .bundle()
     .on('error', function(err) { console.log('Error: ' + err.message); })
-    .pipe(source(config[prefix+'OutputFile']))
-    .pipe(gulp.dest(config[prefix+'OutputDir']))
+    .pipe(source(config.exampleOutputFile))
+    .pipe(gulp.dest(config.exampleOutputDir))
     .pipe(reload({ stream: true }));
 }
 
-gulp.task('compress', function() {
-  return gulp.src('lib/*.js')
-    .pipe(uglify())
-    .pipe(gulp.dest('dist'));
-});
 
 gulp.task('build-persistent', ['clean'], function() {
   return bundle('example');
@@ -58,9 +55,26 @@ gulp.task('build', ['build-persistent'], function() {
 });
 
 gulp.task('build-nux', function() {
-  bundle('nux')
-    .pipe(uglify())
-    .pipe(gulp.dest('./'));
+  browserify(config.nuxEntryFile)
+  .transform(babelify)
+  .bundle()
+  .on('error', function(err) { console.log('Error: ' + err.message); })
+  .pipe(source(config.nuxOutputFile))
+  .pipe(gulp.dest(config.nuxOutputDir))
+  .pipe(streamify(uglify()))
+  .pipe(rename({
+    extname: '.min.js'
+  }))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('build-hello-world', function() {
+  browserify('./hello-world.js')
+  .transform(babelify)
+  .bundle()
+  .on('error', function(err) { console.log('Error: ' + err.message); })
+  .pipe(source('./hello-world.js'))
+  .pipe(gulp.dest('./assets/scripts/'))
 });
 
 gulp.task('watch', ['build-persistent'], function() {

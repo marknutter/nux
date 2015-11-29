@@ -12,9 +12,9 @@ p.call-to-action {
 a {
   color: #000000;
 }
-div {
+div#main, div#example {
   width: 700px;
-  margin: 50px auto 50px auto;
+  margin: 30px auto 20px auto;
 }
 div#main {
   text-align: center;
@@ -25,4 +25,20 @@ div#main {
 }
 div#example {
   overflow: auto;
+}
+div#hello-world {
+  font-size: 16px;
+  padding: 5px;
+}
+
+div#hello-world input {
+  font-size: 16px
+}
+
+div#hello-world form {
+  margin-top: 20px;
+}
+
+div#hello-world span {
+  color: #47AD91;
 }
