@@ -1,0 +1,28 @@
+body {
+  font-family: helvetica;
+}
+p {
+  margin: 40px 0px;
+  text-align: justify;
+}
+p.call-to-action {
+  font-size: 25px;
+  text-align: center;
+}
+a {
+  color: #000000;
+}
+div {
+  width: 700px;
+  margin: 50px auto 50px auto;
+}
+div#main {
+  text-align: center;
+  font-family: helvetica;
+  font-size: 17px;
+  line-height: 26px;
+  color: #666666;
+}
+div#example {
+  overflow: auto;
+}

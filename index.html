@@ -2,13 +2,81 @@
 
   <head>
     <title>Nux</title>
+    <link rel="stylesheet" href="assets/styles/nux.css">
+    <link rel="stylesheet" href="assets/styles/github-syntax-highlighting.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </head>
 
-  <body>
-    <img src="http://i.imgur.com/vZHsn0E.png"/>
+  <style>
 
-    <p>Try the <a href="example/index.html">example todo app here</a></p>
-    <p>Read the <a href="docs/index.html">documentation here</a></p>
+  </style>
+
+  <body>
+    <div id="main">
+      <img src="assets/images/nux-logo.png"/>
+      <p>Nux combines <a href="http://redux.js.org">redux</a>, <a href="https://github.com/Matt-Esch/virtual-dom">virtual-dom</a>,
+      and <a href="http://redux.js.org">immutable-js</a> into a framework that enables the creation of applications whose entire
+      state, UI included, lives in one large immutable object which can only be modified by creating a new state from provided
+      reducer functions. </p>
+      <p>Nux is not just another framework for binding application data to UI templates - it cuts out the middle
+      man by treating UI and application data as one, single object, thus guaranteeing perfect agreement on state throughout an
+      application's lifecycle. Nux can run on the client, on the server, or even in web workers to provide blazing fast rendering.</p>
+      <p class="call-to-action">Try the <a href="example/index.html">example todo app</a></p>
+      <p class="call-to-action">Read the <a href="docs/index.html">documentation</a></p>
+    </div>
+
+    <div id="example">
+      <h3>Hello World Example</h3>
+      <pre><code class="javascript">
+import init from 'nux';
+import {selector} from 'nux/utils';
+
+init((state, action) => {
+  switch (action.type) {
+    case 'SUBMIT_STATEMENT':
+    return state.setIn(selector('div#hello-world form input props value'), '')
+                .setIn(selector('div#hello-world span#output $text'),
+                  state.getIn(selector('div#hello-world form input props value')));
+  }
+  return state;
+}, {
+  'div#hello-world': {
+    children: {
+      'span#output': {
+        props: {
+          style: {
+            fontWeight: 'bold'
+          }
+        }
+      },
+      'form': {
+        props: {
+          events: {
+            'ev-submit': {
+              dispatch: {
+                type: 'SUBMIT_STATEMENT'
+              }
+            }
+          }
+        },
+        children: {
+          'input': {
+            props: {
+              placeholder: 'say something..'
+            }
+          }
+        }
+      }
+    }
+  }
+
+}, {logActions: true});
+
+      </code></pre>
+    </div>
+
+
   </body>
 
 </html>
