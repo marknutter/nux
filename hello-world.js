@@ -1,6 +1,7 @@
 import {init} from './lib/index';
 import {selector} from './lib/utils';
 
+
 init((state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
@@ -9,7 +10,7 @@ init((state, action) => {
                   state.getIn(selector('div#hello-world form input props value')));
   }
   return state;
-}, {
+},{
   'div#hello-world': {
     children: {
       'span#output': {

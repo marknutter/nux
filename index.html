@@ -29,13 +29,19 @@
 
 
     <div id="example">
-      <h3>Hello World Example</h3>
+      <h3>Hello World Example <span>(for the full effect, open your debugger console)</span></h3>
+
       <div id="hello-world-container"></div>
       <pre><code class="javascript">
 import init from 'nux';
 import {selector} from 'nux/utils';
 
-init((state, action) => {
+
+init(
+
+
+// first argument is your reducer - the only concern that modifies your app's state
+(state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
     return state.setIn(selector('div#hello-world form input props value'), '')
@@ -43,7 +49,11 @@ init((state, action) => {
                   state.getIn(selector('div#hello-world form input props value')));
   }
   return state;
-}, {
+},
+
+
+// second argument is your initial app UI state represented as a Nux vDom object
+{
   'div#hello-world': {
     children: {
       'span#output': {
@@ -74,7 +84,20 @@ init((state, action) => {
     }
   }
 
-}, {logActions: true}, document.querySelector('#hello-world-container'));
+},
+
+
+// third argument is your options where you can enable action and state logging
+{logActions: true},
+
+
+// fourth argument is the dom element you want your Nux app to render inside of
+document.querySelector('#hello-world-container')
+
+
+);
+
+// That's all she wrote!
 
       </code></pre>
     </div>

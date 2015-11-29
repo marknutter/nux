@@ -26,6 +26,15 @@ div#main {
 div#example {
   overflow: auto;
 }
+
+div#example h3 span {
+  font-size: 11px;
+  font-weight: normal;
+  line-height: 20px;
+  color: #bbb;
+  display: block
+}
+
 div#hello-world {
   font-size: 16px;
   padding: 5px;
