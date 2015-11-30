@@ -1,4 +1,4 @@
-![NUX](http://i.imgur.com/vZHsn0E.png)
+[![NUX](http://i.imgur.com/vZHsn0E.png)](http://marknutter.github.io/nux)
 
 ####A Push-Based Functional Reactive Web Application Framework
 
