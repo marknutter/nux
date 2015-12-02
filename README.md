@@ -88,7 +88,7 @@ document.querySelector('#hello-world-container')
 - [x] write tests for nux core
 - [x] add options to init() that allow toggling of action logs and localStorage persistence
 - [x] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
-- [ ] add jsdoc comments to nux core
+- [x] add jsdoc comments to nux core
 - [ ] create todoMVC app in separate repo using Nux
 - [ ] build out nux events that mirror common DOM events following pattern used for ev-input
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
