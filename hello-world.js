@@ -33,7 +33,7 @@ init((state, action) => {
         children: {
           'input': {
             props: {
-              placeholder: 'say something..'
+              placeholder: 'type and hit enter..'
             }
           }
         }

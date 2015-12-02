@@ -34,7 +34,7 @@ init(function (state, action) {
         children: {
           input: {
             props: {
-              placeholder: "say something.."
+              placeholder: "type and hit enter.."
             }
           }
         }
@@ -81,7 +81,9 @@ var renderUI = require("./ui").renderUI;
 
 var reducer = require("./reducer").reducer;
 
-var nux = module.exports = {
+var fromJS = require("immutable").fromJS;
+
+var nux = window.nux = module.exports = {
   init: init,
   options: {
     localStorage: false,
@@ -110,7 +112,7 @@ var nux = module.exports = {
  * @return {Store} Redux store where app state is maintained.
  */
 function init(appReducer) {
-  var initialUI = arguments[1] === undefined ? {} : arguments[1];
+  var initialUI = arguments[1] === undefined ? fromJS({ div: {} }) : arguments[1];
   var options = arguments[2] === undefined ? nux.options : arguments[2];
   var elem = arguments[3] === undefined ? document.body : arguments[3];
 
@@ -140,7 +142,7 @@ function init(appReducer) {
   return store;
 }
 
-},{"./reducer":3,"./ui":4,"dom-delegator":10,"redux":24,"virtual-dom/create-element":32,"virtual-dom/diff":33,"virtual-dom/h":34,"virtual-dom/patch":42}],3:[function(require,module,exports){
+},{"./reducer":3,"./ui":4,"dom-delegator":10,"immutable":22,"redux":24,"virtual-dom/create-element":32,"virtual-dom/diff":33,"virtual-dom/h":34,"virtual-dom/patch":42}],3:[function(require,module,exports){
 
 
 /**
@@ -224,6 +226,23 @@ function storeAndLogState(action, nextState, prevState) {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+/**
+ * Accepts a Nux vDOM object and returns a VirtualNode. The vDOM object's 'children' are recursively converted
+ * to VirtualNodes. The 'props' for any given are modified such that any custom events are assigned callbacks
+ * which dispatch the associated actions. The Nux default event handlers are also added to the 'props' object
+ * for a given node. This is where all the magic happens, folks.
+ *
+ * @author Mark Nutter <marknutter@gmail.com>
+ *
+ * @param {Store} store A redux store
+ * @param {Object} ui The Nux vDOM object to be recursively converted into a VirtualNode
+ * @param {Array} [pathArray] The location of the provided vDOM object within another vDOM object (if applicable)
+ * @return {Store} Redux store where app state is maintained.
+ */
+exports.renderUI = renderUI;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 /** @module ui */
 
 var h = _interopRequire(require("virtual-dom/h"));
@@ -235,67 +254,61 @@ var Map = _immutable.Map;
 var List = _immutable.List;
 var Iterable = _immutable.Iterable;
 
-module.exports = {
-  renderUI: renderUI
-};
-
 function renderUI(store, ui) {
   var pathArray = arguments[2] === undefined ? List() : arguments[2];
 
-  var node = ui.map(function (val, key) {
-    var nodeArray = [key];
-    var currentPathArray = pathArray.size === 0 ? pathArray.push(key) : pathArray;
-    var children = new List();
-    if (val.get("children")) {
-      children = val.get("children").map(function (val, key) {
-        if (key === "$text") {
-          return new List([val]);
-        } else {
-          return renderUI(store, new Map().set(key, val), currentPathArray.concat(["children", key]));
-        }
-      });
-    }
-    var props = getPropsWithDefaultEvents(store, val.get("props"), key, currentPathArray);
-    if (props.get("events")) {
-      var propsWithCustomEvents = props.get("events").reduce(function (oldProps, val, key) {
-        var newProps = oldProps.set(key, function (e) {
-          e.preventDefault();
-          store.dispatch(val.get("dispatch").toJS());
-        });
-        return newProps;
-      }, props)["delete"]("events");
-      nodeArray.push(propsWithCustomEvents.toJS());
-    } else {
-      nodeArray.push(props.toJS());
-    }
-    nodeArray.push(children.toList().toJS());
-    return nodeArray;
+  // ui objects come as a key/value pair so extract the key as the tag name and value as the node data
+  var tagName = ui.findKey(function () {
+    return true;
   });
-  return h.apply(this, node.toList().toJS()[0]);
-};
+  var node = ui.get(tagName);
 
-function getPropsWithDefaultEvents(store, _x, tag, currentPathArray) {
-  var props = arguments[1] === undefined ? Map() : arguments[1];
+  // keep track of our current location in the ui vDOM object
+  var currentPathArray = pathArray.size === 0 ? pathArray.push(tagName) : pathArray;
+  var children = List(),
+      props = node.get("props") || Map();
 
-  if (tag.indexOf("input") > -1) {
-    return props.set("ev-input", evInput(store, currentPathArray));
-  } else {
-    return props;
+  // recurse through this node's children and render their UI as hyperscript
+  if (node.get("children")) {
+    children = node.get("children").map(function (childVal, childTagName) {
+      if (childTagName === "$text") {
+        return new List([childVal]);
+      } else {
+        return renderUI(store, new Map().set(childTagName, childVal), currentPathArray.concat(["children", childTagName]));
+      }
+    }).toList();
   }
-};
 
-function evInput(store, currentPathArray) {
-  return function (e) {
-    e.preventDefault();
-    if (e.target.value) {
-      store.dispatch({
-        type: "_UPDATE_INPUT_VALUE",
-        val: e.target.value,
-        pathArray: ["ui"].concat(currentPathArray.toJS())
+  // add an event handler to inputs that updates their 'val' prop node when changes are detected
+  if (tagName.indexOf("input") > -1) {
+    props = props.set("ev-input", function (e) {
+      e.preventDefault();
+      if (e.target.value) {
+        store.dispatch({
+          type: "_UPDATE_INPUT_VALUE",
+          val: e.target.value,
+          pathArray: ["ui"].concat(currentPathArray.toJS())
+        });
+      }
+    });
+  }
+
+  // for any custom events detected, add callbacks that dispatch provided actions
+  if (props.get("events")) {
+    props = props.get("events").reduce(function (oldProps, val, key) {
+      var newProps = oldProps.set(key, function (e) {
+        e.preventDefault();
+        store.dispatch(val.get("dispatch").merge(Map({ event: e })).toJS());
       });
-    }
-  };
-};
+      return newProps;
+    }, props).merge(props)["delete"]("events");
+  }
+
+  // combine tag, props, and children into an array of plain javascript objects and return hyperscript VirtualNode
+  return h.apply(this, [tagName, props.toJS(), children.toJS()]);
+}
+
+;
 
 },{"immutable":22,"virtual-dom/h":34}],5:[function(require,module,exports){
 /** @module utils */

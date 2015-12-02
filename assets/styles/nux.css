@@ -41,7 +41,8 @@ div#hello-world {
 }
 
 div#hello-world input {
-  font-size: 16px
+  font-size: 16px;
+  margin-right: 20px;
 }
 
 div#hello-world form {
