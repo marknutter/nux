@@ -31,6 +31,11 @@ describe('the Nux core ui renderer,', () => {
                 fontSize: '20px'
               }
             }
+          },
+          'span': {
+            children: {
+              $text: 'foo'
+            }
           }
         }
       }
@@ -42,9 +47,10 @@ describe('the Nux core ui renderer,', () => {
       expect(renderedUI).toEqual(
         h('div#app', {style: {
             fontFamily: 'helvetica'
-          }}, h('h1', {style: {
+          }}, [h('h1', {style: {
             fontSize: '20px'
-          }}))
+          }}),
+            h('span', ['foo'])])
       );
     });
 
