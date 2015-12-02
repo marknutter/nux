@@ -1,6 +1,6 @@
 import {fromJS, Map, List, Iterable} from 'immutable';
 import h from 'virtual-dom/h';
-import {getStore, initStore} from './../../lib/store';
+import {createStore} from 'redux';
 import {renderUI} from './../../lib/ui';
 
 
@@ -9,8 +9,7 @@ describe('the Nux core ui renderer,', () => {
   let mockStore;
 
   beforeEach(() => {
-    initStore(() => {});
-    mockStore = getStore();
+    mockStore = createStore((state) => { return state });
     mockStore.dispatch = jasmine.createSpy('dispatch');
     mockStore.getState = jasmine.createSpy('getState');
   });
@@ -32,20 +31,26 @@ describe('the Nux core ui renderer,', () => {
                 fontSize: '20px'
               }
             }
+          },
+          'span': {
+            children: {
+              $text: 'foo'
+            }
           }
         }
       }
     });
 
-    renderedUI = renderUI(testUI);
+    renderedUI = renderUI(mockStore, testUI);
 
     it('should convert a Nux DOM object into a virtual DOM object', () => {
       expect(renderedUI).toEqual(
         h('div#app', {style: {
             fontFamily: 'helvetica'
-          }}, h('h1', {style: {
+          }}, [h('h1', {style: {
             fontSize: '20px'
-          }}))
+          }}),
+            h('span', ['foo'])])
       );
     });
 
@@ -53,25 +58,27 @@ describe('the Nux core ui renderer,', () => {
 
   describe('when given a Nux DOM Object with an input field,', () => {
 
-    let renderedUI;
-    const testUI = fromJS({
-      'form#test': {
-        children: {
-          'input': {
-            props: {
-              placeholder: 'enter stuff'
+      let renderedUI;
+      const testUI = fromJS({
+        'form#test': {
+          children: {
+            'input': {
+              props: {
+                placeholder: 'enter stuff'
+              }
             }
           }
         }
-      }
-    });
+      });
 
-    renderedUI = renderUI(testUI);
+    beforeEach(() => {
+      renderedUI = renderUI(mockStore, testUI);
+    });
 
     it('should add event handling to the input field object', () => {
       expect(renderedUI).toEqual(
-        h('form#test', 
-          h('input', 
+        h('form#test',
+          h('input',
             {
               placeholder: 'enter stuff',
               'ev-input': jasmine.any(Function)
@@ -117,7 +124,9 @@ describe('the Nux core ui renderer,', () => {
       }
     });
 
-    renderedUI = renderUI(testUI);
+    beforeEach(() => {
+      renderedUI = renderUI(mockStore, testUI);
+    });
 
     it('should add event handling to the node', () => {
       expect(renderedUI).toEqual(h('div#test', { 'ev-click': jasmine.any(Function) }));
@@ -131,7 +140,7 @@ describe('the Nux core ui renderer,', () => {
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockStore.dispatch).toHaveBeenCalledWith({ type: 'CUSTOM_ACTION' });
     });
-    
+
 
   });
 
