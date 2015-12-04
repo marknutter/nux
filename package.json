@@ -1,7 +1,7 @@
 {
   "name": "nux",
   "version": "1.0.0",
-  "description": "A functional reactive web framework utilizing redux.js, immutable.js, and virtual-dom.js",
+  "description": "A push-based functional reactive web application framework",
   "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma.conf.js",
@@ -30,7 +30,7 @@
     "type": "git",
     "url": "https://github.com/marknutter/nux.git"
   },
-  "homepage": "https://github.com/ashleygwilliams/my_package",
+  "homepage": "http://marknutter.github.io/nux/",
   "dependencies": {
     "dom-delegator": "^13.1.0",
     "immutable": "^3.7.5",
