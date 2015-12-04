@@ -1,6 +1,6 @@
 {
   "name": "nux",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A functional reactive web framework utilizing redux.js, immutable.js, and virtual-dom.js",
   "main": "gulpfile.js",
   "scripts": {
