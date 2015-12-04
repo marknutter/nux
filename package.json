@@ -2,7 +2,7 @@
   "name": "nux",
   "version": "1.0.0",
   "description": "A functional reactive web framework utilizing redux.js, immutable.js, and virtual-dom.js",
-  "main": "gulpfile.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma.conf.js",
     "generate-docs": "./node_modules/.bin/jsdoc ./lib/*.js --destination ./docs/"
