@@ -14,9 +14,12 @@ var streamify = require('gulp-streamify');
 var rename = require("gulp-rename");
 
 var config = {
-  exampleEntryFile: './example/todo-app.js',
-  exampleOutputDir: './example/dist/',
-  exampleOutputFile: 'todo-app.js',
+  simpleTodoEntryFile: './example/simple-todo/todo-app.js',
+  simpleTodoOutputDir: './example/simple-todo/dist/',
+  simpleTodoOutputFile: 'todo-app.js',
+  todoMVCEntryFile: './example/todo-mvc/todo-app.js',
+  todoMVCOutputDir: './example/todo-mvc/dist/',
+  todoMVCOutputFile: 'todo-mvc.js',
   nuxOutputFile: 'nux.js',
   nuxOutputDir: './',
   nuxEntryFile: './lib/index.js'
@@ -79,6 +82,14 @@ gulp.task('watch', ['build-persistent'], function() {
   getBundler().on('update', function() {
     gulp.start('build-persistent')
   });
+});
+
+gulp.task('watch-simple-todo', ['clean'], function() {
+  return bundle('example');
+});
+
+gulp.task('watch-todo-mvc', ['clean'], function() {
+  return bundle('example');
 });
 
 // WEB SERVER
