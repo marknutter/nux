@@ -1,4 +1,4 @@
-export const todoMVCUi = {
+export const todoMvcUi = {
   'div#todoapp': {
     children: {
       'section.todoapp': {
@@ -11,10 +11,15 @@ export const todoMVCUi = {
                 }
               },
               'input.new-todo': {
-                children: {
-                  props: {
-                    placeholder: 'What needs to be done?',
-                    autofocus: true
+                props: {
+                  placeholder: 'What needs to be done?',
+                  autofocus: true,
+                  events: {
+                    'ev-keyup': {
+                      dispatch: {
+                        type: 'ADD_TODO'
+                      }
+                    }
                   }
                 }
               }
@@ -37,58 +42,7 @@ export const todoMVCUi = {
               },
               'ui.todo-list': {
                 children: {
-                  'li.completed': {
-                    children: {
-                      'div.view': {
-                        children: {
-                          'input.toggle': {
-                            props: {
-                              type: 'checkbox'
-                            }
-                          },
-                          'label': {
-                            children: {
-                              '$text': 'Taste JavaScript'
-                            }
-                          },
-                          'button.destroy': {
 
-                          }
-                        }
-                      },
-                      'input.edit': {
-                        props: {
-                          val: 'Create a TodoMVC template'
-                        }
-                      }
-                    }
-                  },
-                  'li': {
-                    children: {
-                      'div.view': {
-                        children: {
-                          'input.toggle': {
-                            props: {
-                              type: 'checkbox'
-                            }
-                          },
-                          'label': {
-                            children: {
-                              '$text': 'Buy a Unicorn'
-                            }
-                          },
-                          'button.destroy': {
-
-                          }
-                        }
-                      },
-                      'input.edit': {
-                        props: {
-                          val: 'Rule the web'
-                        }
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -151,7 +105,7 @@ export const todoMVCUi = {
                 }
               }
             }
-          }   
+          }
         }
       },
       'footer.info': {
