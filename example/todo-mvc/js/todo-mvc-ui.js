@@ -1,0 +1,170 @@
+export const todoMVCUi = {
+  'div#todoapp': {
+    children: {
+      'section.todoapp': {
+        children: {
+          'header.header': {
+            children: {
+              'h1': {
+                children: {
+                  '$text': 'todos'
+                }
+              },
+              'input.new-todo': {
+                children: {
+                  props: {
+                    placeholder: 'What needs to be done?',
+                    autofocus: true
+                  }
+                }
+              }
+            }
+          },
+          'section.main': {
+            children: {
+              'input.toggle-all': {
+                props: {
+                  type: 'checkbox'
+                }
+              },
+              'label': {
+                props: {
+                  for: 'toggle-all'
+                },
+                children: {
+                  '$text': 'Mark all as complete'
+                }
+              },
+              'ui.todo-list': {
+                children: {
+                  'li.completed': {
+                    children: {
+                      'div.view': {
+                        children: {
+                          'input.toggle': {
+                            props: {
+                              type: 'checkbox'
+                            }
+                          },
+                          'label': {
+                            children: {
+                              '$text': 'Taste JavaScript'
+                            }
+                          },
+                          'button.destroy': {
+
+                          }
+                        }
+                      },
+                      'input.edit': {
+                        props: {
+                          val: 'Create a TodoMVC template'
+                        }
+                      }
+                    }
+                  },
+                  'li': {
+                    children: {
+                      'div.view': {
+                        children: {
+                          'input.toggle': {
+                            props: {
+                              type: 'checkbox'
+                            }
+                          },
+                          'label': {
+                            children: {
+                              '$text': 'Buy a Unicorn'
+                            }
+                          },
+                          'button.destroy': {
+
+                          }
+                        }
+                      },
+                      'input.edit': {
+                        props: {
+                          val: 'Rule the web'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          'footer.footer': {
+            children: {
+              'span.todo-count': {
+                children: {
+                  'strong': {
+                    children: {
+                      '$text': '0'
+                    }
+                  },
+                  '$text': 'item left'
+                }
+              },
+              'ul.filters': {
+                children: {
+                  'li': {
+                    children: {
+                      'a.selected': {
+                        props: {
+                          href: '#/'
+                        },
+                        children: {
+                          '$text': 'All'
+                        }
+                      }
+                    }
+                  },
+                  'li': {
+                    children: {
+                      'a.selected': {
+                        props: {
+                          href: '#/active'
+                        },
+                        children: {
+                          '$text': 'Active'
+                        }
+                      }
+                    }
+                  },
+                  'li': {
+                    children: {
+                      'a.selected': {
+                        props: {
+                          href: '#/completed'
+                        },
+                        children: {
+                          '$text': 'Completed'
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              'button.clear-completed': {
+                children: {
+                  '$text': 'Clear completed'
+                }
+              }
+            }
+          }   
+        }
+      },
+      'footer.info': {
+        children: {
+          'p': {
+            children: {
+              '$text': 'Double-click to edit a todo'
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+
