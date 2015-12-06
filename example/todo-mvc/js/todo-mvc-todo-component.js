@@ -4,6 +4,9 @@ export function todoComponent(title, tag) {
   return fromJS({
     children: {
       'div.view': {
+        props: {
+
+        },
         children: {
           'input.toggle': {
             props: {

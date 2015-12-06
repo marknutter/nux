@@ -34,12 +34,19 @@ export const todoMvcUi = {
             children: {
               'input.toggle-all': {
                 props: {
-                  type: 'checkbox'
+                  type: 'checkbox',
+                  events: {
+                    'ev-change': {
+                      dispatch: {
+                        type: 'TOGGLE_ALL_TODOS'
+                      }
+                    }
+                  }
                 }
               },
               'label': {
                 props: {
-                  for: 'toggle-all'
+                  htmlFor: 'toggle-all'
                 },
                 children: {
                   '$text': 'Mark all as complete'
@@ -61,7 +68,11 @@ export const todoMvcUi = {
                       '$text': '0'
                     }
                   },
-                  '$text': 'item left'
+                  'span': {
+                    children: {
+                      '$text': ' item left'
+                    }
+                  }
                 }
               },
               'ul.filters': {

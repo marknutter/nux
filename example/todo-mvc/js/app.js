@@ -1,4 +1,4 @@
-import {addTodo, toggleTodo} from './todo-mvc-reducers';
+import {addTodo, toggleTodo, toggleAllTodos} from './todo-mvc-reducers';
 import {init} from './../../../lib/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
@@ -8,6 +8,8 @@ init((state, action) => {
       return addTodo(state, action.event);
     case 'TOGGLE_TODO':
       return toggleTodo(state, action.tag);
+    case 'TOGGLE_ALL_TODOS':
+      return toggleAllTodos(state);
   }
   return state;
 }, todoMvcUi, {localStorage: false, logActions: true});
