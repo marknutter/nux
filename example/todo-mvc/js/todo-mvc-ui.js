@@ -26,6 +26,11 @@ export const todoMvcUi = {
             }
           },
           'section.main': {
+            props: {
+              style: {
+                display: 'none'
+              }
+            },
             children: {
               'input.toggle-all': {
                 props: {
@@ -109,6 +114,11 @@ export const todoMvcUi = {
         }
       },
       'footer.info': {
+        props: {
+          style: {
+            display: 'none'
+          }
+        },
         children: {
           'p': {
             children: {

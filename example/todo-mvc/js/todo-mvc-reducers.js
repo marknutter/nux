@@ -3,9 +3,10 @@ import {todoComponent} from './todo-mvc-todo-component';
 
 const todoListSelector = 'div#todoapp section.todoapp section.main ui.todo-list';
 const todoInputSelector = 'div#todoapp section.todoapp header.header input.new-todo props value';
+const ENTER_KEY = 13;
 
 export function addTodo(state, event) {
-  if(event.keyCode == 13){
+  if(event.keyCode === ENTER_KEY){
     const todos = state.getIn(selector(todoListSelector + ' children'));
     const tag = `li#${todos.size}`;
     const title = state.getIn(selector(todoInputSelector));
@@ -18,7 +19,8 @@ export function addTodo(state, event) {
                           return keyA < keyB ? 1 : -1;
                         });
     return state.setIn(selector(todoInputSelector), '')
-                .setIn(selector(todoListSelector + ' children'), sortedTodos);
+                .setIn(selector(todoListSelector + ' children'), sortedTodos)
+                .deleteIn(selector('div#todoapp section.todoapp section.main props style display'));
   }
   return state
 }
