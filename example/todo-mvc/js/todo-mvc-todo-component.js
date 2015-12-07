@@ -54,9 +54,16 @@ export function todoComponent(title, tag) {
         props: {
           val: title,
           events: {
-            'ev-keyup': {
+            // TODO - split this into separate keyCode events
+            'ev-keyup-13': {
               dispatch: {
                 type: 'EDIT_TODO',
+                tag: tag
+              }
+            },
+            'ev-keyup-27': {
+              dispatch: {
+                type: 'CANCEL_EDIT_TODO',
                 tag: tag
               }
             }

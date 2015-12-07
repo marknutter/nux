@@ -13,11 +13,11 @@ export function addTodo(state, event) {
   if(event.keyCode === ENTER_KEY) {
     if (title) {
       const todos = state.getIn(selector(todoListPath + ' children'));
-      const tag = `li#${todos.size}`;
+      const tag = `li#todo-${todos.size}`;
       let newTodo = todoComponent(title.trim(), tag);
       const newTodos = todos.set(tag, newTodo);
       const sortedTodos = newTodos.sortBy((val, key) => {
-                            return parseInt(key.split("#")[1]);
+                            return parseInt(key.split("#todo-")[1]);
                           }, (keyA, keyB) => {
                             return keyA < keyB ? 1 : -1;
                           });
@@ -48,20 +48,21 @@ export function showEditTodo(state, tag) {
               .setIn(selector(`${todoListPath} ${tag} props className`), 'editing');
 }
 
+
+
 export function editTodo(state, tag) {
   const newTitle = state.getIn(selector(`${todoListPath} ${tag} input.edit props value`));
-  switch(event.keyCode) {
-    case ENTER_KEY:
-      if (newTitle) {
-        return state.setIn(selector(`${todoListPath} ${tag} div.view label $text`), newTitle)
-                    .deleteIn(selector(`${todoListPath} ${tag} props className`));
-      } else {
-        return deleteTodo(state.deleteIn(selector(`${todoListPath} ${tag} props className`)), tag);
-      }
-    case ESCAPE_KEY:
-      return state.deleteIn(selector(`${todoListPath} ${tag} props className`));
+  if (newTitle) {
+    return state.setIn(selector(`${todoListPath} ${tag} div.view label $text`), newTitle)
+                .deleteIn(selector(`${todoListPath} ${tag} props className`));
+  } else {
+    return deleteTodo(state.deleteIn(selector(`${todoListPath} ${tag} props className`)), tag);
   }
   return state;
+}
+
+export function cancelEditTodo(state, tag) {
+  return state.deleteIn(selector(`${todoListPath} ${tag} props className`));
 }
 
 export function deleteTodo(state, tag) {
