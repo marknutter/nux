@@ -15,7 +15,7 @@ export const todoMvcUi = {
                   placeholder: 'What needs to be done?',
                   autofocus: true,
                   events: {
-                    'ev-keyup': {
+                    'ev-keyup-13': {
                       dispatch: {
                         type: 'ADD_TODO'
                       }
