@@ -100,7 +100,7 @@ document.querySelector('#hello-world-container')
 - [ ] get rid of need for "ev-" prefix on events
 - [ ] get rid of nested 'dispatch' key on event objects
 - [ ] allow path to lead off with 'children' in selector utility
-- [ ] change ev-input to ev-keyup in nux default events and use to capture all manner of keystrokes
+- [x] change ev-input to ev-keyup in nux default events and use to capture all manner of keystrokes
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
 - [ ] write tests for example app
 - [ ] add fancy styling to action logger
