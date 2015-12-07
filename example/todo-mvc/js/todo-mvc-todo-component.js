@@ -22,18 +22,45 @@ export function todoComponent(title, tag) {
             }
           },
           'label': {
+            props: {
+              events: {
+                'ev-dblclick': {
+                  dispatch: {
+                    type: 'SHOW_EDIT_TODO',
+                    tag: tag
+                  }
+                }
+              }
+            },
             children: {
               '$text': title
             }
           },
           'button.destroy': {
-
+            props: {
+              events: {
+                'ev-click': {
+                  dispatch: {
+                    type: 'DELETE_TODO',
+                    tag: tag
+                  }
+                }
+              }
+            }
           }
         }
       },
       'input.edit': {
         props: {
-          val: title
+          val: title,
+          events: {
+            'ev-keyup': {
+              dispatch: {
+                type: 'EDIT_TODO',
+                tag: tag
+              }
+            }
+          }
         }
       }
     }

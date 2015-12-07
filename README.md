@@ -90,6 +90,10 @@ document.querySelector('#hello-world-container')
 - [x] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
 - [x] add jsdoc comments to nux core
 - [ ] create todoMVC app in separate repo using Nux
+- [ ] figure out what to do about child elements - keep them as nested objects, or children in an array? what to do about sorting?
+- [ ] allow additional options to be passed into event objects like stopPropagation:true/false
+- [ ] add router
+- [ ] allow path to lead off with 'children' in selector utility
 - [ ] build out nux events that mirror common DOM events following pattern used for ev-input
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
 - [ ] write tests for example app

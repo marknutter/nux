@@ -60,6 +60,11 @@ export const todoMvcUi = {
             }
           },
           'footer.footer': {
+            props: {
+              style: {
+                display: 'none'
+              }
+            },
             children: {
               'span.todo-count': {
                 children: {
@@ -77,11 +82,20 @@ export const todoMvcUi = {
               },
               'ul.filters': {
                 children: {
-                  'li': {
+                  'li.all': {
                     children: {
-                      'a.selected': {
+                      'a': {
                         props: {
-                          href: '#/'
+                          href: '#/',
+                          events: {
+                            'ev-click': {
+                              dispatch: {
+                                type: 'SHOW_TODOS',
+                                view: 'all'
+                              }
+                            }
+                          },
+                          className: 'selected'
                         },
                         children: {
                           '$text': 'All'
@@ -89,11 +103,19 @@ export const todoMvcUi = {
                       }
                     }
                   },
-                  'li': {
+                  'li.active': {
                     children: {
-                      'a.selected': {
+                      'a': {
                         props: {
-                          href: '#/active'
+                          href: '#/active',
+                          events: {
+                            'ev-click': {
+                              dispatch: {
+                                type: 'SHOW_TODOS',
+                                view: 'active'
+                              }
+                            }
+                          }
                         },
                         children: {
                           '$text': 'Active'
@@ -101,11 +123,19 @@ export const todoMvcUi = {
                       }
                     }
                   },
-                  'li': {
+                  'li.completed': {
                     children: {
-                      'a.selected': {
+                      'a': {
                         props: {
-                          href: '#/completed'
+                          href: '#/completed',
+                          events: {
+                            'ev-click': {
+                              dispatch: {
+                                type: 'SHOW_TODOS',
+                                view: 'completed'
+                              }
+                            }
+                          }
                         },
                         children: {
                           '$text': 'Completed'
@@ -116,6 +146,15 @@ export const todoMvcUi = {
                 }
               },
               'button.clear-completed': {
+                props: {
+                  events: {
+                    'ev-click': {
+                      dispatch: {
+                        type: 'CLEAR_COMPLETED_TODOS'
+                      }
+                    }
+                  }
+                },
                 children: {
                   '$text': 'Clear completed'
                 }
