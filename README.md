@@ -78,7 +78,7 @@ document.querySelector('#hello-world-container')
 // That's all she wrote!
 ```
 
-###todo
+###Todo
 
 - [x] add logic to just persist todos as an alternative to saving entire ui tree
 - [x] create mapping from event handlers to function callbacks so entire ui tree can be stringified and saved
