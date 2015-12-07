@@ -89,10 +89,16 @@ document.querySelector('#hello-world-container')
 - [x] add options to init() that allow toggling of action logs and localStorage persistence
 - [x] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
 - [x] add jsdoc comments to nux core
-- [ ] create todoMVC app in separate repo using Nux
+- [ ] create todoMVC app using Nux
 - [ ] figure out what to do about child elements - keep them as nested objects, or children in an array? what to do about sorting?
 - [ ] allow additional options to be passed into event objects like stopPropagation:true/false
+- [ ] convert these todos to github issues
+- [ ] create contribution guide
 - [ ] add router
+- [ ] add $ attribute to every immutable-js state object that acts as a jquery-like library to modify nux vDom objects
+- [ ] implement nux event that fires when a predicate is true. e.g. "do something when this element becomes visible"
+- [ ] get rid of need for "ev-" prefix on events
+- [ ] get rid of nested 'dispatch' key on event objects
 - [ ] allow path to lead off with 'children' in selector utility
 - [ ] build out nux events that mirror common DOM events following pattern used for ev-input
 - [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
