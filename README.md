@@ -94,7 +94,8 @@ document.querySelector('#hello-world-container')
 - [ ] allow additional options to be passed into event objects like stopPropagation:true/false
 - [ ] convert these todos to github issues
 - [ ] create contribution guide
-- [ ] add router
+- [x] add router
+- [x] change initialUI to initialAppState which includes 'router' and any other non ui data
 - [ ] add $ attribute to every immutable-js state object that acts as a jquery-like library to modify nux vDom objects
 - [ ] implement nux event that fires when a predicate is true. e.g. "do something when this element becomes visible"
 - [ ] get rid of need for "ev-" prefix on events
