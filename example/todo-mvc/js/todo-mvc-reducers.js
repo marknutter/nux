@@ -43,6 +43,9 @@ export function toggleTodo(state, tag) {
 }
 
 export function showEditTodo(state, tag) {
+  setTimeout(() => {
+    document.querySelector(`${tag} input.edit`).focus()
+  },0);
   const currentTitle = state.getIn(selector(`${todoListPath} ${tag} div.view label $text`));
   return state.setIn(selector(`${todoListPath} ${tag} input.edit props value`), currentTitle)
               .setIn(selector(`${todoListPath} ${tag} props className`), 'editing');

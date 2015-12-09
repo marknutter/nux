@@ -61,6 +61,12 @@ export function todoComponent(title, tag) {
                 tag: tag
               }
             },
+            'ev-blur': {
+              dispatch: {
+                type: 'EDIT_TODO',
+                tag: tag
+              }
+            },
             'ev-keyup-27': {
               dispatch: {
                 type: 'CANCEL_EDIT_TODO',
