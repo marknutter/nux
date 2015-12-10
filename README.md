@@ -89,19 +89,21 @@ document.querySelector('#hello-world-container')
 - [x] add options to init() that allow toggling of action logs and localStorage persistence
 - [x] write store helpers that provide boilerplate logic for actions such as selecting elements in the vdom object
 - [x] add jsdoc comments to nux core
-- [ ] create todoMVC app using Nux
+- [x] create todoMVC app using Nux
+- [x] change ev-input to ev-keyup in nux default events and use to capture all manner of keystrokes
+- [x] add router
+- [x] change initialUI to initialAppState which includes 'router' and any other non ui data
+- [x] create a simple website for hosting on github.com.
+- [ ] require that routes be passed in on the initial state object instead of as an option
+- [ ] add $ attribute to every immutable-js state object that acts as a jquery-like library to modify nux vDom objects
+- [ ] get rid of need for "ev-" prefix on events
+- [ ] get rid of nested 'dispatch' key on event objects
+- [ ] allow path to lead off with 'children' in selector utility
+- [ ] implement nux event that fires when a predicate is true. e.g. "do something when this element becomes visible"
+- [ ] write tests for todoMVC app
+- [ ] write tests for simple todo app
 - [ ] figure out what to do about child elements - keep them as nested objects, or children in an array? what to do about sorting?
 - [ ] allow additional options to be passed into event objects like stopPropagation:true/false
 - [ ] convert these todos to github issues
 - [ ] create contribution guide
-- [x] add router
-- [x] change initialUI to initialAppState which includes 'router' and any other non ui data
-- [ ] add $ attribute to every immutable-js state object that acts as a jquery-like library to modify nux vDom objects
-- [ ] implement nux event that fires when a predicate is true. e.g. "do something when this element becomes visible"
-- [ ] get rid of need for "ev-" prefix on events
-- [ ] get rid of nested 'dispatch' key on event objects
-- [ ] allow path to lead off with 'children' in selector utility
-- [x] change ev-input to ev-keyup in nux default events and use to capture all manner of keystrokes
-- [ ] create a simple website for hosting on github.com. Dogfood nux to show these todos
-- [ ] write tests for example app
 - [ ] add fancy styling to action logger

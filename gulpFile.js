@@ -47,18 +47,6 @@ function bundle(prefix) {
     .pipe(reload({ stream: true }));
 }
 
-gulp.task('clean-todo-mvc', function(cb){
-    rimraf(config.todoMVCOutputDir, cb);
-});
-
-gulp.task('build-persistent', ['clean'], function() {
-  return bundle('example');
-});
-
-gulp.task('build', ['build-persistent'], function() {
-  process.exit(0);
-});
-
 gulp.task('build-nux', function() {
   browserify(config.nuxEntryFile)
   .transform(babelify)
@@ -73,18 +61,6 @@ gulp.task('build-nux', function() {
   .pipe(gulp.dest('./'));
 });
 
-// gulp.task('watch', ['build-persistent'], function() {
-
-//   browserSync({
-//     server: {
-//       baseDir: './example/'
-//     }
-//   });
-
-//   getBundler().on('update', function() {
-//     gulp.start('build-persistent')
-//   });
-// });
 
 gulp.task('watch-simple-todo', function(cb) {
   rimraf(config.simpleTodoOutputDir, cb);
@@ -103,6 +79,14 @@ gulp.task('watch-simple-todo', function(cb) {
 
 });
 
+gulp.task('build-simple-todo', ['clean-simple-todo'], function() {
+  return bundle('todoTodo')
+});
+
+gulp.task('clean-simple-todo', function(cb){
+    rimraf(config.simpleTodoOutputDir, cb);
+});
+
 gulp.task('watch-todo-mvc', ['build-todo-mvc'], function(cb) {
   browserSync({
     server: {
@@ -117,6 +101,10 @@ gulp.task('watch-todo-mvc', ['build-todo-mvc'], function(cb) {
 
 gulp.task('build-todo-mvc', ['clean-todo-mvc'], function() {
   return bundle('todoMVC')
+});
+
+gulp.task('clean-todo-mvc', function(cb){
+    rimraf(config.todoMVCOutputDir, cb);
 });
 
 // WEB SERVER
