@@ -35,7 +35,8 @@
     "dom-delegator": "^13.1.0",
     "immutable": "^3.7.5",
     "redux": "^3.0.4",
-    "virtual-dom": "^2.1.1"
+    "virtual-dom": "^2.1.1",
+    "rlite-router": "^1.1.1"
   },
   "devDependencies": {
     "babelify": "~5.0.3",
