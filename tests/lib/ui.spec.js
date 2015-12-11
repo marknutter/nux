@@ -81,7 +81,7 @@ describe('the Nux core ui renderer,', () => {
           h('input',
             {
               placeholder: 'enter stuff',
-              'ev-input': jasmine.any(Function)
+              'ev-keyup': jasmine.any(Function)
             }
           )
         )
@@ -95,7 +95,7 @@ describe('the Nux core ui renderer,', () => {
           value: 'foo'
         }
       };
-      renderedUI.children[0].properties['ev-input'].value(mockEvent);
+      renderedUI.children[0].properties['ev-keyup'].value(mockEvent);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockStore.dispatch).toHaveBeenCalledWith({
         type: '_UPDATE_INPUT_VALUE',
@@ -138,7 +138,7 @@ describe('the Nux core ui renderer,', () => {
       };
       renderedUI.properties['ev-click'].value(mockEvent);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
-      expect(mockStore.dispatch).toHaveBeenCalledWith({ type: 'CUSTOM_ACTION' });
+      expect(mockStore.dispatch).toHaveBeenCalledWith({ type: 'CUSTOM_ACTION', event: mockEvent });
     });
 
 
