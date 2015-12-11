@@ -10,4 +10,4 @@ init((state, action) => {
       return toggleTodo(state, action.tag);
   }
   return state;
-}, todoUi, {localStorage: true, logActions: true});
+}, todoUi, {localStorage: false, logActions: true});
