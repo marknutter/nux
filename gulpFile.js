@@ -14,45 +14,38 @@ var streamify = require('gulp-streamify');
 var rename = require("gulp-rename");
 
 var config = {
-  exampleEntryFile: './example/todo-app.js',
-  exampleOutputDir: './example/dist/',
-  exampleOutputFile: 'todo-app.js',
+  simpleTodoEntryFile: './example/simple-todo/todo-app.js',
+  simpleTodoOutputDir: './example/simple-todo/dist/',
+  simpleTodoDir: './example/simple-todo/',
+  simpleTodoOutputFile: 'todo-app.js',
+  todoMVCEntryFile: './example/todo-mvc/js/app.js',
+  todoMVCOutputDir: './example/todo-mvc/dist/',
+  todoMVCDir: './example/todo-mvc/',
+  todoMVCOutputFile: 'todo-mvc.js',
   nuxOutputFile: 'nux.js',
   nuxOutputDir: './',
   nuxEntryFile: './lib/index.js'
 };
 
-// clean the output directory
-gulp.task('clean', function(cb){
-    rimraf(config.exampleOutputDir, cb);
-});
+
 
 var bundler;
-function getBundler() {
+function getBundler(prefix) {
   if (!bundler) {
-    bundler = watchify(browserify(config.exampleEntryFile, _.extend({ debug: true }, watchify.args)));
+    bundler = watchify(browserify(config[prefix + 'EntryFile'], _.extend({ debug: true }, watchify.args)));
   }
   return bundler;
 };
 
 function bundle(prefix) {
-  return getBundler()
+  return getBundler(prefix)
     .transform(babelify)
     .bundle()
     .on('error', function(err) { console.log('Error: ' + err.message); })
-    .pipe(source(config.exampleOutputFile))
-    .pipe(gulp.dest(config.exampleOutputDir))
+    .pipe(source(config[prefix + 'OutputFile']))
+    .pipe(gulp.dest(config[prefix + 'OutputDir']))
     .pipe(reload({ stream: true }));
 }
-
-
-gulp.task('build-persistent', ['clean'], function() {
-  return bundle('example');
-});
-
-gulp.task('build', ['build-persistent'], function() {
-  process.exit(0);
-});
 
 gulp.task('build-nux', function() {
   browserify(config.nuxEntryFile)
@@ -77,17 +70,49 @@ gulp.task('build-hello-world', function() {
   .pipe(gulp.dest('./assets/scripts/'))
 });
 
-gulp.task('watch', ['build-persistent'], function() {
+gulp.task('watch-simple-todo', function(cb) {
+  rimraf(config.simpleTodoOutputDir, cb);
 
   browserSync({
     server: {
-      baseDir: './example/'
+      baseDir: config.simpleTodoDir
     }
   });
 
-  getBundler().on('update', function() {
-    gulp.start('build-persistent')
+  getBundler('simpleTodo').on('update', function() {
+    bundle('simpleTodo')
   });
+
+  bundle('simpleTodo')
+
+});
+
+gulp.task('build-simple-todo', ['clean-simple-todo'], function() {
+  return bundle('todoTodo')
+});
+
+gulp.task('clean-simple-todo', function(cb){
+    rimraf(config.simpleTodoOutputDir, cb);
+});
+
+gulp.task('watch-todo-mvc', ['build-todo-mvc'], function(cb) {
+  browserSync({
+    server: {
+      baseDir: config.todoMVCDir
+    }
+  });
+
+  getBundler('todoMVC').on('update', function() {
+    gulp.start('build-todo-mvc')
+  });
+});
+
+gulp.task('build-todo-mvc', ['clean-todo-mvc'], function() {
+  return bundle('todoMVC')
+});
+
+gulp.task('clean-todo-mvc', function(cb){
+    rimraf(config.todoMVCOutputDir, cb);
 });
 
 // WEB SERVER

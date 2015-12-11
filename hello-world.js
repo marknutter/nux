@@ -5,40 +5,28 @@ import {selector} from './lib/utils';
 init((state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
-    return state.setIn(selector('div#hello-world form input props value'), '')
-                .setIn(selector('div#hello-world span#output $text'),
-                  state.getIn(selector('div#hello-world form input props value')));
+    const inputVal = selector('div#hw input props value');
+    return state.setIn(selector('div#hw h5 $text'), state.getIn(inputVal))
+                .setIn(inputVal, '');
   }
   return state;
 },{
-  'div#hello-world': {
+  'div#hw': {
     children: {
-      'span#output': {
-        props: {
-          style: {
-            fontWeight: 'bold'
-          }
-        }
+      'h5': {
       },
-      'form': {
+      'input': {
         props: {
-          events: {
-            'ev-submit': {
+          placeholder: 'type and hit enter..',
+            events: {
+            'ev-keyup-13': {
               dispatch: {
                 type: 'SUBMIT_STATEMENT'
               }
-            }
-          }
-        },
-        children: {
-          'input': {
-            props: {
-              placeholder: 'type and hit enter..'
             }
           }
         }
       }
     }
   }
-
 }, {logActions: true}, document.querySelector('#hello-world-container'));

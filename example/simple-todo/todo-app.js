@@ -1,5 +1,5 @@
 import {submitTodo, toggleTodo} from './todo-reducers';
-import {init} from './../lib/index';
+import {init} from './../../lib/index';
 import {todoUi} from './todo-ui'
 
 init((state, action) => {
@@ -10,4 +10,4 @@ init((state, action) => {
       return toggleTodo(state, action.tag);
   }
   return state;
-}, todoUi, {localStorage: true, logActions: true});
+}, todoUi, {localStorage: false, logActions: true});

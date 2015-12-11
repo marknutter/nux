@@ -25,7 +25,8 @@
       <p>Nux is not just another framework for binding application data to UI templates - it cuts out the middle
       man by treating UI and application data as one, single object, thus guaranteeing perfect agreement on state throughout an
       application's lifecycle. Nux can run on the client, on the server, or even in web workers to provide blazing fast rendering.</p>
-      <p class="call-to-action">Try the <a href="example/index.html">example todo app</a></p>
+      <p class="call-to-action">Try the <a href="example/simple-todo/index.html">simple example todo app</a></p>
+      <p class="call-to-action">Try the <a href="example/todo-mvc/index.html">todoMVC app</a></p>
       <p class="call-to-action">Read the <a href="docs/index.html">documentation</a></p>
     </div>
 
@@ -47,9 +48,9 @@ init(
 (state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
-    return state.setIn(selector('div#hello-world form input props value'), '')
-                .setIn(selector('div#hello-world span#output $text'),
-                  state.getIn(selector('div#hello-world form input props value')));
+    const inputVal = selector('div#hw input props value');
+    return state.setIn(selector('div#hw h5 $text'), state.getIn(inputVal))
+                .setIn(inputVal, '');
   }
   return state;
 },
@@ -57,36 +58,24 @@ init(
 
 // second argument is your initial app UI state represented as a Nux vDom object
 {
-  'div#hello-world': {
+  'div#hw': {
     children: {
-      'span#output': {
-        props: {
-          style: {
-            fontWeight: 'bold'
-          }
-        }
+      'h5': {
       },
-      'form': {
+      'input': {
         props: {
-          events: {
-            'ev-submit': {
+          placeholder: 'type and hit enter..',
+            events: {
+            'ev-keyup-13': {
               dispatch: {
                 type: 'SUBMIT_STATEMENT'
               }
-            }
-          }
-        },
-        children: {
-          'input': {
-            props: {
-              placeholder: 'type and hit enter..'
             }
           }
         }
       }
     }
   }
-
 },
 
 
@@ -97,10 +86,7 @@ init(
 // fourth argument is the dom element you want your Nux app to render inside of
 document.querySelector('#hello-world-container')
 
-
-);
-
-// That's all she wrote!
+); // That's all she wrote!
 
       </code></pre>
     </div>
