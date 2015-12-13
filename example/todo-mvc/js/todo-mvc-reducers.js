@@ -5,28 +5,24 @@ import {todoComponent} from './todo-mvc-todo-component';
 const todoListPath = 'div#todoapp section.todoapp section.main ui.todo-list';
 const todoInputPath = 'div#todoapp section.todoapp header.header input.new-todo props value';
 const toggleAllCheckedPath = 'div#todoapp section.todoapp section.main input.toggle-all props checked';
-const ENTER_KEY = 13,
-      ESCAPE_KEY = 27;
 
 export function addTodo(state, event) {
   const title = state.getIn(selector(todoInputPath));
-  if(event.keyCode === ENTER_KEY) {
-    if (title) {
-      const todos = state.getIn(selector(todoListPath + ' children'));
-      const tag = `li#todo-${todos.size}`;
-      let newTodo = todoComponent(title.trim(), tag);
-      const newTodos = todos.set(tag, newTodo);
-      const sortedTodos = newTodos.sortBy((val, key) => {
-                            return parseInt(key.split("#todo-")[1]);
-                          }, (keyA, keyB) => {
-                            return keyA < keyB ? 1 : -1;
-                          });
-      return setItemsLeft(state.setIn(selector(todoInputPath), '')
-                               .setIn(selector(todoListPath + ' children'), sortedTodos)
-                               .deleteIn(selector('div#todoapp section.todoapp section.main props style display')));
-    } else {
-      state.setIn(selector(todoInputPath), '');
-    }
+  if (title) {
+    const todos = state.getIn(selector(todoListPath + ' children'));
+    const tag = `li#todo-${todos.size}`;
+    let newTodo = todoComponent(title.trim(), tag);
+    const newTodos = todos.set(tag, newTodo);
+    const sortedTodos = newTodos.sortBy((val, key) => {
+                          return parseInt(key.split("#todo-")[1]);
+                        }, (keyA, keyB) => {
+                          return keyA < keyB ? 1 : -1;
+                        });
+    return setItemsLeft(state.setIn(selector(todoInputPath), '')
+                             .setIn(selector(todoListPath + ' children'), sortedTodos)
+                             .deleteIn(selector('div#todoapp section.todoapp section.main props style display')));
+  } else {
+    state.setIn(selector(todoInputPath), '');
   }
   return state;
 }
