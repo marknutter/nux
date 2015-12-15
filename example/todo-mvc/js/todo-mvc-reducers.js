@@ -3,13 +3,13 @@ import {selector} from './../../../lib/utils';
 import {todoComponent} from './todo-mvc-todo-component';
 
 const todoListPath = 'div#todoapp section.todoapp section.main ui.todo-list';
-const todoInputPath = 'div#todoapp section.todoapp header.header input.new-todo props value';
+const todoInputPath = 'div#todoapp section.todoapp header.header input.new-todo';
 const toggleAllCheckedPath = 'div#todoapp section.todoapp section.main input.toggle-all props checked';
 
 export function addTodo(state, event) {
-  const title = state.getIn(selector(todoInputPath));
+  const title = state.$(todoInputPath).props('value'); //state.getIn(selector(todoInputPath));
   if (title) {
-    const todos = state.getIn(selector(todoListPath + ' children'));
+    const todos = state.$(todoListPath).children() //state.getIn(selector(todoListPath + ' children'));
     const tag = `li#todo-${todos.size}`;
     let newTodo = todoComponent(title.trim(), tag);
     const newTodos = todos.set(tag, newTodo);
@@ -18,8 +18,8 @@ export function addTodo(state, event) {
                         }, (keyA, keyB) => {
                           return keyA < keyB ? 1 : -1;
                         });
-    return setItemsLeft(state.setIn(selector(todoInputPath), '')
-                             .setIn(selector(todoListPath + ' children'), sortedTodos)
+    return setItemsLeft(state.propsIn(todoInputPath, 'value', '')
+                             .setIn(selector(todoListPath + ' children'), state.$(todoListPath))
                              .deleteIn(selector('div#todoapp section.todoapp section.main props style display')));
   } else {
     state.setIn(selector(todoInputPath), '');
