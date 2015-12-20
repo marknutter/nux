@@ -8,7 +8,6 @@ const toggleAllCheckedPath = 'ui div#todoapp section.todoapp section.main input.
 
 export function addTodo(state, event) {
   const title = state.$(todoInputPath).props('value'); //state.getIn(selector(todoInputPath));
-  debugger
   if (title) {
     const todos = state.$(todoListPath).children() //state.getIn(selector(todoListPath + ' children'));
 
