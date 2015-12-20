@@ -2,14 +2,16 @@ import {fromJS, Map, List, Iterable} from 'immutable';
 import {selector} from './../../../lib/utils';
 import {todoComponent} from './todo-mvc-todo-component';
 
-const todoListPath = 'div#todoapp section.todoapp section.main ui.todo-list';
-const todoInputPath = 'div#todoapp section.todoapp header.header input.new-todo';
-const toggleAllCheckedPath = 'div#todoapp section.todoapp section.main input.toggle-all props checked';
+const todoListPath = 'ui div#todoapp section.todoapp section.main ui.todo-list';
+const todoInputPath = 'ui div#todoapp section.todoapp header.header input.new-todo';
+const toggleAllCheckedPath = 'ui div#todoapp section.todoapp section.main input.toggle-all props checked';
 
 export function addTodo(state, event) {
   const title = state.$(todoInputPath).props('value'); //state.getIn(selector(todoInputPath));
+  debugger
   if (title) {
     const todos = state.$(todoListPath).children() //state.getIn(selector(todoListPath + ' children'));
+
     const tag = `li#todo-${todos.size}`;
     let newTodo = todoComponent(title.trim(), tag);
     const newTodos = todos.set(tag, newTodo);
@@ -18,11 +20,11 @@ export function addTodo(state, event) {
                         }, (keyA, keyB) => {
                           return keyA < keyB ? 1 : -1;
                         });
-    return setItemsLeft(state.propsIn(todoInputPath, 'value', '')
-                             .setIn(selector(todoListPath + ' children'), state.$(todoListPath))
-                             .deleteIn(selector('div#todoapp section.todoapp section.main props style display')));
+    return setItemsLeft(state.$(todoInputPath).props('value', '')
+                             .$(todoListPath).children(sortedTodos)
+                             .$('ui div#todoapp section.todoapp section.main').style('display', null));
   } else {
-    state.setIn(selector(todoInputPath), '');
+    state.propsIn(todoInputPath, 'value', '')
   }
   return state;
 }
@@ -96,11 +98,11 @@ export function showTodos(state, view) {
       return todo.deleteIn(['props', 'style', 'display']);
     }
   });
-  const filters = state.getIn(selector(`div#todoapp section.todoapp footer.footer ul.filters children`)).map((filter, key) => {
+  const filters = state.getIn(selector(`ui div#todoapp section.todoapp footer.footer ul.filters children`)).map((filter, key) => {
     return filter.setIn(['children', 'a', 'props', 'className'], key.indexOf(view) !== -1 ? 'selected' : '');
   });
   return state.setIn(selector(`${todoListPath} children`), todos)
-              .setIn(selector(`div#todoapp section.todoapp footer.footer ul.filters children`), filters);
+              .setIn(selector(`ui div#todoapp section.todoapp footer.footer ul.filters children`), filters);
 }
 
 export function clearCompletedTodos(state) {
@@ -109,7 +111,7 @@ export function clearCompletedTodos(state) {
 }
 
 function setItemsLeft(state) {
-  const todoCountPath = 'div#todoapp section.todoapp footer.footer span.todo-count';
+  const todoCountPath = 'ui div#todoapp section.todoapp footer.footer span.todo-count';
   const activeCount = getTodos(state, 'active').size;
   const newState =  state.setIn(selector(`${todoCountPath} strong $text`), activeCount)
                          .setIn(selector(`${todoCountPath} span $text`), activeCount === 0 ? ' item left' : ' items left');
@@ -118,9 +120,9 @@ function setItemsLeft(state) {
 }
 
 function getTodos(state, view = 'all') {
-  return state.getIn(selector(`${todoListPath} children`))
+  return state.$(todoListPath).children()
               .filter((todo) => {
-                const checked = todo.getIn(['children'].concat(selector(`div.view input.toggle props checked`, false)));
+                const checked = todo.children().$('div.view input.toggle').props('checked');
                 return checked === undefined && view === 'active' || checked && view === 'completed' ||view === 'all';
               });
 }
@@ -128,10 +130,10 @@ function getTodos(state, view = 'all') {
 
 function toggleMainAndFooter(state, isVisible) {
   if (isVisible) {
-    return state.deleteIn(selector('div#todoapp section.todoapp section.main props style display'))
-                   .deleteIn(selector('div#todoapp section.todoapp footer.footer props style display'));
+    return state.deleteIn(selector('ui div#todoapp section.todoapp section.main props style display'))
+                   .deleteIn(selector('ui div#todoapp section.todoapp footer.footer props style display'));
   } else {
-    return state.setIn(selector('div#todoapp section.todoapp section.main props style display'), 'none')
-                   .setIn(selector('div#todoapp section.todoapp footer.footer props style display'), 'none');
+    return state.setIn(selector('ui div#todoapp section.todoapp section.main props style display'), 'none')
+                   .setIn(selector('ui div#todoapp section.todoapp footer.footer props style display'), 'none');
   }
 }

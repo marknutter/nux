@@ -39,7 +39,7 @@ let store = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, todoMvcUi, {localStorage: true, logActions: true, routes: routes});
+}, todoMvcUi, {localStorage: false, logActions: true, routes: routes});
 
 // let currentView = window.location.hash.split("#/")[1] || 'all';
 
