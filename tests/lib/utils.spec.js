@@ -151,6 +151,7 @@ describe('the Nux utility ', () => {
 
     });
 
+
     describe("props() method", () => {
 
       it("should return a Nux vDom node's props", () => {
@@ -159,6 +160,41 @@ describe('the Nux utility ', () => {
             color: 'white'
           }
         });
+      });
+
+      it("should return blank Map when no props are found", () => {
+        expect(tree.$('ui div#foo div.bar').props().toJS()).toEqual({});
+      });
+
+      it("should return a Nux vDom node's props when the event name is provided", () => {
+        expect(tree.$('ui div#foo input.biz').props('events').toJS()).toEqual({
+          'ev-click': {
+            dispatch: {
+              type: 'CLICK'
+            }
+          }
+        });
+      });
+
+      it("should allow setting of a Nux vDom node's props", () => {
+        let expectedState = tree.setIn(['ui', 'div#foo', 'children', 'input.biz', 'props', 'placeholder'], 'type here');
+        expect(tree.$('ui div#foo input.biz').props('placeholder', 'type here').toJS()).toEqual(expectedState.toJS());
+      });
+
+      it("should allow setting of multiple Nux vDom node props", () => {
+        const testprops = {
+          'placeholder': 'type here',
+          'value': 'hello world'
+        }
+        let expectedState = tree.mergeIn(['ui', 'div#foo', 'children', 'input.biz', 'props'], Map(testprops));
+        expect(tree.$('ui div#foo input.biz').props(testprops).toJS()).toEqual(expectedState.toJS());
+      });
+
+      it("should return unmodified Nux vDom node props if parameters are invalid", () => {
+        expect(tree.$('ui div#foo input.biz').props(null, 'foo').toJS()).toEqual(tree.toJS());
+        expect(tree.$('ui div#foo input.biz').props(null).toJS()).toEqual(tree.toJS());
+        expect(tree.$('ui div#foo input.biz').props(5, 'foo').toJS()).toEqual(tree.toJS());
+        expect(tree.$('ui div#foo input.biz').props(5).toJS()).toEqual(tree.toJS());
       });
 
     });
@@ -198,7 +234,7 @@ describe('the Nux utility ', () => {
 
     });
 
-    fdescribe("events() method", () => {
+    describe("events() method", () => {
 
       it("should return a Nux vDom node's events when no parameters are provided", () => {
         expect(tree.$('ui div#foo input.biz').events().toJS()).toEqual({
@@ -253,32 +289,6 @@ describe('the Nux utility ', () => {
         expect(tree.$('ui div#foo input.biz').events('blah', 'foo').toJS()).toEqual(tree.toJS());
         expect(tree.$('ui div#foo input.biz').events(5, 'foo').toJS()).toEqual(tree.toJS());
         expect(tree.$('ui div#foo input.biz').events(5).toJS()).toEqual(tree.toJS());
-      });
-
-    });
-
-
-    describe("eventsIn() method", () => {
-
-      it("should allow deep setting of a Nux vDom node's events", () => {
-        const testEvent = {
-          dispatch: {
-            type: 'BLUR'
-          }
-        }
-        const expectedState = tree.setIn(['ui', 'div#foo', 'children', 'input.biz', 'props', 'events', 'ev-blur'], fromJS(testEvent))
-        expect(tree.$('ui div#foo input.biz').events('ev-blur', testEvent).toJS()).toEqual({
-          'ev-click': {
-            dispatch: {
-              type: 'CLICK'
-            }
-          },
-          'ev-blur': {
-            dispatch: {
-              type: 'BLUR'
-            }
-          }
-        });
       });
 
     });

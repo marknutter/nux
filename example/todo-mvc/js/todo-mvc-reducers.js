@@ -23,50 +23,54 @@ export function addTodo(state, event) {
                              .$(todoListPath).children(sortedTodos)
                              .$('ui div#todoapp section.todoapp section.main').style('display', null));
   } else {
-    state.propsIn(todoInputPath, 'value', '')
+    state.$(todoInputPath).props('value', '');
   }
   return state;
 }
 
 export function toggleTodo(state, tag) {
-  const checked = state.getIn(selector(`${todoListPath} ${tag} div.view input.toggle props checked`));
+  const todoPath = `${todoListPath} ${tag}`;
+  const checked = state.$(`${todoPath} div.view input.toggle`).props('checked');
   if (checked === undefined) {
-    const newState = state.setIn(selector(`${todoListPath} ${tag} div.view input.toggle props checked`), 'checked');
-    return setItemsLeft(newState.setIn(selector(`${todoListPath} ${tag} props className`), 'completed'));
+    const newState = state.$(`${todoPath} div.view input.toggle`).props('checked', 'checked');
+    return setItemsLeft(newState.$(todoPath).props('className', 'completed'));
   } else {
-    const newState = state.deleteIn(selector(`${todoListPath} ${tag} div.view input.toggle props checked`));
-    return setItemsLeft(newState.deleteIn(selector(`${todoListPath} ${tag} props className`)));
+    const newState = state.$(`${todoPath} div.view input.toggle`).props('checked', null);
+    return setItemsLeft(newState.$(todoPath).props('className', null));
   }
 }
 
 export function showEditTodo(state, tag) {
+  const todoPath = `${todoListPath} ${tag}`;
+  // need to come up with a better solution than this. There should be no dependency on the DOM
   setTimeout(() => {
     document.querySelector(`${tag} input.edit`).focus()
   },0);
-  const currentTitle = state.getIn(selector(`${todoListPath} ${tag} div.view label $text`));
-  return state.setIn(selector(`${todoListPath} ${tag} input.edit props value`), currentTitle)
-              .setIn(selector(`${todoListPath} ${tag} props className`), 'editing');
+  const currentTitle = state.$(`${todoPath} div.view label`).children('$text');
+  return state.$(`${todoPath} input.edit`).props('value', currentTitle)
+              .$(todoPath).props('className', 'editing');
 }
 
 
 
 export function editTodo(state, tag) {
-  const newTitle = state.getIn(selector(`${todoListPath} ${tag} input.edit props value`));
+  const todoPath = `${todoListPath} ${tag}`;
+  const newTitle = state.$(`${todoPath} input.edit`).props('value');
   if (newTitle) {
-    return state.setIn(selector(`${todoListPath} ${tag} div.view label $text`), newTitle)
-                .deleteIn(selector(`${todoListPath} ${tag} props className`));
+    return state.$(`${todoPath} div.view label`).children('$text', newTitle)
+                .$(todoPath).props('className', null);
   } else {
-    return deleteTodo(state.deleteIn(selector(`${todoListPath} ${tag} props className`)), tag);
+    return deleteTodo(state.$(todoPath).props('className', null), tag);
   }
   return state;
 }
 
 export function cancelEditTodo(state, tag) {
-  return state.deleteIn(selector(`${todoListPath} ${tag} props className`));
+  return state.$(`${todoListPath} ${tag}`).props('className', null);
 }
 
 export function deleteTodo(state, tag) {
-  return setItemsLeft(state.deleteIn(selector(`${todoListPath} ${tag}`)));
+  return setItemsLeft(state.$(todoListPath).children(tag, null));
 }
 
 export function toggleAllTodos(state) {
