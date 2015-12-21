@@ -4,6 +4,7 @@ import {todoComponent} from './todo-mvc-todo-component';
 
 const todoListPath = 'ui div#todoapp section.todoapp section.main ui.todo-list';
 const todoInputPath = 'ui div#todoapp section.todoapp header.header input.new-todo';
+const toggleAllPath = 'ui div#todoapp section.todoapp section.main input.toggle-all';
 const toggleAllCheckedPath = 'ui div#todoapp section.todoapp section.main input.toggle-all props checked';
 
 export function addTodo(state, event) {
@@ -75,19 +76,16 @@ export function deleteTodo(state, tag) {
 
 export function toggleAllTodos(state) {
 
-  const checked = state.getIn(selector(toggleAllCheckedPath));
-  const newState = checked === undefined ? state.setIn(selector(toggleAllCheckedPath), 'checked') : state.deleteIn(selector(toggleAllCheckedPath));
-  const todos = newState.getIn(selector(`${todoListPath} children`)).map((todo) => {
-    const checkboxSelector = ['children'].concat(selector(`div.view input.toggle props checked`, false));
-    if (checked === undefined) {
-      return todo.setIn(['props', 'className'], 'completed')
-                 .setIn(checkboxSelector, 'checked');
-    } else {
-      return todo.deleteIn(['props', 'className'])
-                 .deleteIn(checkboxSelector);
-    }
+  const checked = state.$(toggleAllPath).props('checked') === undefined ? 'checked' : null;
+  const completed = checked && 'completed';
+  const newState = state.$(toggleAllPath).props('checked', checked);
+  const todos = newState.$(todoListPath).children().map((todo) => {
+    return todo.props('className', completed)
+                .$('div.view input.toggle')
+                .children('')
+                .props('checked', checked);
   });
-  return setItemsLeft(newState.setIn(selector(`${todoListPath} children`), todos));
+  return setItemsLeft(newState.$(todoListPath).children(todos));
 }
 
 export function showTodos(state, view) {
