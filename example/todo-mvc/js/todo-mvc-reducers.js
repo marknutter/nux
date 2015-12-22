@@ -79,11 +79,10 @@ export function toggleAllTodos(state) {
   const checked = state.$(toggleAllPath).props('checked') === undefined ? 'checked' : null;
   const completed = checked && 'completed';
   const newState = state.$(toggleAllPath).props('checked', checked);
-  const todos = newState.$(todoListPath).children().map((todo) => {
-    return todo.props('className', completed)
-                .$('div.view input.toggle')
-                .children('')
-                .props('checked', checked);
+  const todos = newState.$(todoListPath).children().map((todo, tagName, node) => {
+    return node.props('className', completed)
+                .$(`${tagName} div.view input.toggle`)
+                .props('checked', checked).get(tagName);
   });
   return setItemsLeft(newState.$(todoListPath).children(todos));
 }
