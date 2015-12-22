@@ -79,30 +79,32 @@ export function toggleAllTodos(state) {
   const checked = state.$(toggleAllPath).props('checked') === undefined ? 'checked' : null;
   const completed = checked && 'completed';
   const newState = state.$(toggleAllPath).props('checked', checked);
-  const todos = newState.$(todoListPath).children().map((todo, tagName, node) => {
-    return node.props('className', completed)
-                .$(`${tagName} div.view input.toggle`)
-                .props('checked', checked).get(tagName);
+  const todos = newState.$(todoListPath).children().map((val, key) => {
+    const todo = val.toNode(key);
+    return todo.props('className', completed)
+                .$(`${key} div.view input.toggle`)
+                .props('checked', checked).get(key);
   });
   return setItemsLeft(newState.$(todoListPath).children(todos));
 }
 
 export function showTodos(state, view) {
+  const filtersPath = 'ui div#todoapp section.todoapp footer.footer ul.filters';
   window.location = `#/${view}`;
-  const todos = state.getIn(selector(`${todoListPath} children`)).map((todo) => {
-    const checkboxSelector = ['children'].concat(selector(`div.view input.toggle props checked`, false));
-    if (todo.getIn(checkboxSelector) && view === 'active' ||
-        !todo.getIn(checkboxSelector) && view === 'completed') {
-      return todo.setIn(['props', 'style', 'display'], 'none');
+  const todos = state.$(todoListPath).children().map((val, key) => {
+    const todo = val.toNode(key);
+    const checked = todo.$(`${key} div.view input.toggle`).props('checked');
+    if (checked && view === 'active' || !checked && view === 'completed') {
+      return todo.style('display', 'none').get(key);
     } else {
-      return todo.deleteIn(['props', 'style', 'display']);
+      return todo.style('display', null).get(key);
     }
   });
-  const filters = state.getIn(selector(`ui div#todoapp section.todoapp footer.footer ul.filters children`)).map((filter, key) => {
-    return filter.setIn(['children', 'a', 'props', 'className'], key.indexOf(view) !== -1 ? 'selected' : '');
+  const filters = state.$(filtersPath).children().map((val, key) => {
+    const filter = val.toNode(key);
+    return filter.$('a').props('className', key.indexOf(view) !== -1 ? 'selected' : '').get(key);
   });
-  return state.setIn(selector(`${todoListPath} children`), todos)
-              .setIn(selector(`ui div#todoapp section.todoapp footer.footer ul.filters children`), filters);
+  return state.$(todoListPath).children(todos).$(filtersPath).children(filters);
 }
 
 export function clearCompletedTodos(state) {
