@@ -102,14 +102,14 @@ export function showTodos(state, view) {
   });
   const filters = state.$(filtersPath).children().map((val, key) => {
     const filter = val.toNode(key);
-    return filter.$('a').props('className', key.indexOf(view) !== -1 ? 'selected' : '').get(key);
+    return filter.$(`${key} a`).props('className', key.indexOf(view) !== -1 ? 'selected' : '').get(key);
   });
   return state.$(todoListPath).children(todos).$(filtersPath).children(filters);
 }
 
 export function clearCompletedTodos(state) {
   const activeTodos = getTodos(state, 'active');
-  return setItemsLeft(state.setIn(selector(`${todoListPath} children`), activeTodos));
+  return setItemsLeft(state.$(todoListPath).children(activeTodos));
 }
 
 function setItemsLeft(state) {
@@ -123,7 +123,8 @@ function setItemsLeft(state) {
 
 function getTodos(state, view = 'all') {
   return state.$(todoListPath).children()
-              .filter((todo) => {
+              .filter((val, key) => {
+                const todo = val.toNode(key);
                 const checked = todo.children().$('div.view input.toggle').props('checked');
                 return checked === undefined && view === 'active' || checked && view === 'completed' ||view === 'all';
               });
