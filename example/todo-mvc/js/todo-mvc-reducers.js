@@ -5,7 +5,8 @@ import {todoComponent} from './todo-mvc-todo-component';
 const todoListPath = 'ui div#todoapp section.todoapp section.main ui.todo-list';
 const todoInputPath = 'ui div#todoapp section.todoapp header.header input.new-todo';
 const toggleAllPath = 'ui div#todoapp section.todoapp section.main input.toggle-all';
-const toggleAllCheckedPath = 'ui div#todoapp section.todoapp section.main input.toggle-all props checked';
+const mainPath = 'ui div#todoapp section.todoapp section.main';
+const footerPath = 'ui div#todoapp section.todoapp footer.footer';
 
 export function addTodo(state, event) {
   const title = state.$(todoInputPath).props('value'); //state.getIn(selector(todoInputPath));
@@ -113,12 +114,14 @@ export function clearCompletedTodos(state) {
 }
 
 function setItemsLeft(state) {
+  const toggleAllPath = 'ui div#todoapp section.todoapp section.main input.toggle-all';
   const todoCountPath = 'ui div#todoapp section.todoapp footer.footer span.todo-count';
   const activeCount = getTodos(state, 'active').size;
-  const newState =  state.setIn(selector(`${todoCountPath} strong $text`), activeCount)
-                         .setIn(selector(`${todoCountPath} span $text`), activeCount === 0 ? ' item left' : ' items left');
-  const newState2 = activeCount === 0 ? newState.setIn(selector(toggleAllCheckedPath), 'checked') : newState.deleteIn(selector(toggleAllCheckedPath))
-  return toggleMainAndFooter(newState2, getTodos(state).size > 0);
+  return  state.$(`${todoCountPath} strong`).children('$text', activeCount)
+               .$(`${todoCountPath} span`).children('$text', activeCount === 0 ? ' item left' : ' items left')
+               .$(toggleAllPath).props('checked', activeCount === 0 ? 'checked' : null)
+               .$(`${mainPath}`).style('display', getTodos(state).size > 0 ? null : 'none')
+               .$(`${footerPath}`).style('display', getTodos(state).size > 0 ? null : 'none');
 }
 
 function getTodos(state, view = 'all') {
@@ -128,15 +131,4 @@ function getTodos(state, view = 'all') {
                 const checked = todo.children().$('div.view input.toggle').props('checked');
                 return checked === undefined && view === 'active' || checked && view === 'completed' ||view === 'all';
               });
-}
-
-
-function toggleMainAndFooter(state, isVisible) {
-  if (isVisible) {
-    return state.deleteIn(selector('ui div#todoapp section.todoapp section.main props style display'))
-                   .deleteIn(selector('ui div#todoapp section.todoapp footer.footer props style display'));
-  } else {
-    return state.setIn(selector('ui div#todoapp section.todoapp section.main props style display'), 'none')
-                   .setIn(selector('ui div#todoapp section.todoapp footer.footer props style display'), 'none');
-  }
 }
