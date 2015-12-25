@@ -50,7 +50,7 @@ export function showEditTodo(state, tag) {
   },0);
   const currentTitle = state.$(`${todoPath} div.view label`).children('$text');
   return state.$(`${todoPath} input.edit`).props('value', currentTitle)
-              .$(todoPath).props('className', 'editing');
+              .$(todoPath).props('className', state.$(todoPath).props('className') + ' editing');
 }
 
 
@@ -59,8 +59,7 @@ export function editTodo(state, tag) {
   const todoPath = `${todoListPath} ${tag}`;
   const newTitle = state.$(`${todoPath} input.edit`).props('value');
   if (newTitle) {
-    return state.$(`${todoPath} div.view label`).children('$text', newTitle)
-                .$(todoPath).props('className', null);
+    return cancelEditTodo(state, tag).$(`${todoPath} div.view label`).children('$text', newTitle);
   } else {
     return deleteTodo(state.$(todoPath).props('className', null), tag);
   }
@@ -68,7 +67,8 @@ export function editTodo(state, tag) {
 }
 
 export function cancelEditTodo(state, tag) {
-  return state.$(`${todoListPath} ${tag}`).props('className', null);
+  let className = state.$(`${todoListPath} ${tag}`).props('className');
+  return state.$(`${todoListPath} ${tag}`).props('className', className.replace(' editing', ''));
 }
 
 export function deleteTodo(state, tag) {
