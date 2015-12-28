@@ -41,9 +41,4 @@ let store = init((state, action) => {
   return state;
 }, todoMvcUi, {localStorage: false, logActions: true, routes: routes});
 
-// let currentView = window.location.hash.split("#/")[1] || 'all';
 
-// store.dispatch({
-//   type: 'SHOW_TODOS',
-//   view: currentView
-// })
