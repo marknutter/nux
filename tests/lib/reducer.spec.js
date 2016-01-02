@@ -1,4 +1,4 @@
-import {reducer} from './../../lib/reducer';
+import {reducer} from './../../src/reducer';
 import {Map, fromJS, Iterable, OrderedMap} from 'immutable';
 
 

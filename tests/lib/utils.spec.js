@@ -1,6 +1,6 @@
 import {fromJS, Map, List, Iterable} from 'immutable';
 import h from 'virtual-dom/h';
-import {selector} from './../../lib/utils';
+import {selector} from './../../src/utils';
 import {createStore} from 'redux';
 
 describe('the Nux utility ', () => {

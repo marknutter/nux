@@ -1,11 +1,14 @@
-'use strict';
+/** @module reducer */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.reducer = reducer;
 
-var _immutable = require('immutable');
+/**
+ * An Immutable Map.
+ * @typedef {Object} Map
+ */
+
+
+import {fromJS, Iterable, Map} from 'immutable';
+
 
 /**
  * Create a reducer using a provided reducer combined with Nux's internal reducer. An initial vDOM UI object
@@ -21,20 +24,15 @@ var _immutable = require('immutable');
  * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
  * @return {Function} Reducer function to be used to initialize a Redux store
  */
-function reducer(appReducer) {
-  var initialUI = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-  var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+export function reducer(appReducer, initialUI = {}, options = {}) {
 
-  var initialState = (0, _immutable.fromJS)({ ui: initialUI }, function (key, value) {
-    var isIndexed = _immutable.Iterable.isIndexed(value);
+  const initialState = fromJS({ui: initialUI}, function (key, value) {
+    var isIndexed = Iterable.isIndexed(value);
     return isIndexed ? value.toList() : value.toOrderedMap();
-  }).merge(options.routes ? (0, _immutable.fromJS)({ routes: options.routes }) : {});
+  }).merge(options.routes ? fromJS({routes: options.routes}) : {});
 
-  return function () {
-    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-    var action = arguments[1];
-
-    var nextState = undefined;
+  return function(state = initialState, action) {
+    let nextState;
     switch (action.type) {
       case '_UPDATE_INPUT_VALUE':
         nextState = state.setIn(action.pathArray.concat(['props', 'value']), action.val);
@@ -47,7 +45,7 @@ function reducer(appReducer) {
       storeAndLogState(action, nextState, state);
     }
     return nextState;
-  };
+  }
 }
 
 /**
@@ -61,14 +59,16 @@ function reducer(appReducer) {
  * @param {Map} nextState The state resulting from having performed the given action
  * @param {Map} prevState The state as it was before the given action was performed
  */
-/** @module reducer */
-
-/**
- * An Immutable Map.
- * @typedef {Object} Map
- */
-
 function storeAndLogState(action, nextState, prevState) {
-  var nextStateJS = nextState.toJS();
-  console.log('\n----------------------------------------------------------------\nACTION TAKEN   ', action, '\nNEW STATE      ', nextStateJS, '\nPREVIOUS STATE ', prevState.toJS(), '\n----------------------------------------------------------------');
+  const nextStateJS = nextState.toJS();
+  console.log(`
+----------------------------------------------------------------
+ACTION TAKEN   `, action, `
+NEW STATE      `, nextStateJS, `
+PREVIOUS STATE `, prevState.toJS(), `
+----------------------------------------------------------------`
+  );
 }
+
+
+

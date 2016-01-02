@@ -1,7 +1,7 @@
 import {fromJS, Map, List, Iterable} from 'immutable';
 import h from 'virtual-dom/h';
 import {createStore} from 'redux';
-import {renderUI} from './../../lib/ui';
+import {renderUI} from './../../src/ui';
 
 
 

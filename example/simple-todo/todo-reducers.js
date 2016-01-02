@@ -1,5 +1,5 @@
 import {todoComponent} from './todo-component';
-import {selector} from './../../lib/utils';
+import {selector} from './../../srx/utils';
 
 const todosPathArray = ['div#app div#todos div#todo-container children'];
 

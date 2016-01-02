@@ -1,5 +1,5 @@
 import {addTodo, toggleTodo, toggleAllTodos, showTodos, clearCompletedTodos, deleteTodo, showEditTodo, editTodo, cancelEditTodo} from './todo-mvc-reducers';
-import {init} from './../../../lib/index';
+import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
 let routes = {

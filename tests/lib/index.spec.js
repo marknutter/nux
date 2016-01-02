@@ -1,4 +1,4 @@
-import {init} from './../../lib/index';
+import {init} from './../../src/index';
 import {fromJS} from 'immutable';
 
 describe('the Nux init function', () => {

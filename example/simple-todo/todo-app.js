@@ -1,5 +1,5 @@
 import {submitTodo, toggleTodo} from './todo-reducers';
-import {init} from './../../lib/index';
+import {init} from './../../src/index';
 import {todoUi} from './todo-ui'
 
 init((state, action) => {
