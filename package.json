@@ -1,6 +1,6 @@
 {
   "name": "nux",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A push-based functional reactive web application framework",
   "main": "lib/index.js",
   "scripts": {
