@@ -18,7 +18,9 @@ import diff from 'virtual-dom/diff';
 import patch from 'virtual-dom/patch';
 import createElement from 'virtual-dom/create-element';
 import delegator from 'dom-delegator';
-import {createStore, compose} from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import createLogger from 'redux-logger';
+import {createStore, compose, applyMiddleware} from 'redux';
 import utils from './utils';
 import {renderUI} from './ui';
 import {reducer} from './reducer';
@@ -66,7 +68,16 @@ function init(appReducer, initialUI = fromJS({div: {}}), options = nux.options, 
 
 
   let router = Rlite();
-  let store = createStore(reducer(appReducer, initialState, options));
+  let middleWare = [thunkMiddleware];
+  if (options.logActions) {
+    middleWare.push(createLogger({
+      stateTransformer: (state) => {
+        return state.toJS();
+      }
+    }));
+  }
+  const createStoreWithMiddleware = applyMiddleware.apply(this, middleWare)(createStore);
+  let store = createStoreWithMiddleware(reducer(appReducer, initialState, options));
   let currentUI = store.getState().get('ui').toVNode(store);
   let rootNode = createElement(currentUI);
 

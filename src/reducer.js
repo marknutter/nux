@@ -41,33 +41,8 @@ export function reducer(appReducer, initialUI = {}, options = {}) {
         nextState = appReducer(state, action);
         break;
     }
-    if (options.logActions) {
-      storeAndLogState(action, nextState, state);
-    }
     return nextState;
   }
-}
-
-/**
- * Log the previous state, an action, and the new state that resulted from that action
- *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Advance state change logging.
- *
- * @param {Object} action The redux action object.
- * @param {Object} action.type The redux action type.
- * @param {Map} nextState The state resulting from having performed the given action
- * @param {Map} prevState The state as it was before the given action was performed
- */
-function storeAndLogState(action, nextState, prevState) {
-  const nextStateJS = nextState.toJS();
-  console.log(`
-----------------------------------------------------------------
-ACTION TAKEN   `, action, `
-NEW STATE      `, nextStateJS, `
-PREVIOUS STATE `, prevState.toJS(), `
-----------------------------------------------------------------`
-  );
 }
 
 
