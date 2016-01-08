@@ -30,7 +30,7 @@ Collection.prototype.children = function() {
     return children;
   }
   if (arguments[0] && typeof arguments[0] === 'object') {
-    children = arguments[0];
+    children = fromJS(arguments[0]);
   } else if (typeof arguments[0] === 'string' && arguments[1] !== undefined) {
     children = arguments[1] === null ? children.delete(arguments[0]) : children.set(arguments[0], arguments[1]);
   } else if (arguments.length === 1 && typeof arguments[0] === 'string') {

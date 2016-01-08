@@ -61,13 +61,15 @@ export function renderUI (store, ui, pathArray = List()) {
     props = props.get('events').reduce((oldProps, val, key) => {
       if (key.indexOf('ev-keyup') > -1) {
         registeredKeyEvents[key] = (e) => {
-          store.dispatch(val.get('dispatch').merge(Map({event:e})).toJS());
+          fireDispatch(store, val, event);
+          createAction(store, val, event);
         };
         return oldProps;
       } else {
         return oldProps.set(key, (e) => {
           e.preventDefault();
-          store.dispatch(val.get('dispatch').merge(Map({event:e})).toJS());
+          fireDispatch(store, val, event);
+          createAction(store, val, event);
         });
       }
     }, props).delete('events');
@@ -77,4 +79,25 @@ export function renderUI (store, ui, pathArray = List()) {
   return h.apply(this, [tagName, props.toJS(), children.toJS()]);
 };
 
+function fireDispatch(store, val, event) {
+  if (val.get('dispatch')) {
+    store.dispatch(val.get('dispatch').merge(Map({event})).toJS());
+  }
+}
 
+function createAction(store, val, event) {
+  if (val.get('action')) {
+    // if the action is an object, pass that object along as the argument to the action creator
+    if (typeof val.getIn(['action', 'type']) === 'string') {
+      let actionCreator = store.getActionCreator(val.getIn(['action', 'type']))
+      let action = val.get('action').merge(Map({event})).toJS();
+      store.dispatch(actionCreator(action));
+    }
+    // if the action is just the action name, then fire it without any arguments
+    else if(typeof val.get('action') === 'string') {
+      let actionCreator = store.getActionCreator(val.get('action'));
+      let action = Map({type: val.get('action'), event}).toJS();
+      store.dispatch(actionCreator(action));
+    }
+  }
+}

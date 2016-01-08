@@ -58,8 +58,8 @@ var nux = window.nux = module.exports = {
  * @param {Element} [elem=HTMLBodyElement] The element into which the nux application will be rendered.
  * @return {Store} Redux store where app state is maintained.
  */
-function init(appReducer, initialUI = fromJS({div: {}}), options = nux.options, elem = document.body) {
-  let initialState = initialUI;
+function init(appReducer, actionCreators = {}, options = nux.options, elem = document.body) {
+  let initialState = options.initialUI ? fromJS(options.initialUI) : fromJS({div: {}});
   if (options.localStorage && localStorage.getItem('nux')) {
     initialState = JSON.parse(localStorage.getItem('nux'));
   };
@@ -80,8 +80,11 @@ function init(appReducer, initialUI = fromJS({div: {}}), options = nux.options, 
   let store = createStoreWithMiddleware(reducer(appReducer, initialState, options));
   let currentUI = store.getState().get('ui').toVNode(store);
   let rootNode = createElement(currentUI);
-
   elem.appendChild(rootNode);
+
+  store.getActionCreator = function(actionName) {
+    return actionCreators[actionName];
+  }
 
   if (store.getState().get('routes')) {
     store.getState().get('routes').forEach((action, route) => {
