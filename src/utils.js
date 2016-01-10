@@ -25,7 +25,10 @@ Collection.prototype.$ = function $(query, setVal) {
 
 Collection.prototype.children = function() {
   const tagName = this.findKey(() => { return true });
-  let children = this.getIn([tagName, 'children']) || this.get('children') || new Map();
+  let node = this.set(tagName, this.get(tagName) || new Map)
+
+  let children = this.get(tagName) && this.get(tagName).filterNot((key) => { key === 'props' }) || new Map();
+  let props = this.getIn([tagName, 'props'])  || new Map();
   if (arguments.length === 0) {
     return children;
   }
@@ -36,7 +39,7 @@ Collection.prototype.children = function() {
   } else if (arguments.length === 1 && typeof arguments[0] === 'string') {
     return children.get(arguments[0]);
   }
-  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query).concat('children'), children) : this.setIn([tagName, 'children'], children);
+  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query), children.set('props', props)) : this.set(tagName, children.set('props', props));
 }
 
 Collection.prototype.toNode = function toNode(tagName) {
@@ -139,23 +142,7 @@ Collection.prototype.events = function() {
  * @return {Array} Path array used to deeply select inside of Immutable Nux vDOM objects
  */
 export function selector(selectorString) {
-  var domPathArray = selectorString.split(' props')[0].split(' ');
-  var fullDomPathArray = domPathArray.reduce(function(cur, val, index) {
-    if (val === 'children') {
-      return cur;
-    }
-    if (val === 'ui' || val === 'props') {
-      return cur.concat([val]);
-    } else {
-      return domPathArray.length === index+1 ? cur.concat([val]) : cur.concat([val, 'children']);
-    }
-  },[]);
-  var toConcat = [];
-  if (selectorString.indexOf('props') > 0) {
-    var propsPathArray = selectorString.split('props')[1].split(' ');
-      toConcat = ['props'].concat(propsPathArray.slice(1));
-  }
-  return fullDomPathArray.concat(toConcat);
+  return selectorString.split(' ');
 };
 
 

@@ -29,14 +29,15 @@ export function renderUI (store, ui, pathArray = List()) {
   let children = List(),
       props = node.get('props') || Map();
 
+  let childNodes = node.filterNot((val, key) => { return key === 'props' });
 
   // recurse through this node's children and render their UI as hyperscript
-  if (node.get('children')) {
-    children = node.get('children').map((childVal, childTagName) => {
+  if (childNodes) {
+    children = childNodes.map((childVal, childTagName) => {
       if (childTagName === '$text') {
         return new List([childVal]);
       } else {
-        return renderUI(store, (new Map()).set(childTagName, childVal), currentPathArray.concat(['children', childTagName]));
+        return renderUI(store, (new Map()).set(childTagName, childVal), currentPathArray.concat([childTagName]));
       }
     }).toList();
   }

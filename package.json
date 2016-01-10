@@ -34,6 +34,7 @@
   "dependencies": {
     "dom-delegator": "^13.1.0",
     "immutable": "^3.7.5",
+    "reduce-reducers": "^0.1.1",
     "redux": "^3.0.4",
     "redux-logger": "^2.3.1",
     "redux-thunk": "^1.0.3",

@@ -24,7 +24,7 @@ import {fromJS, Iterable, Map} from 'immutable';
  * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
  * @return {Function} Reducer function to be used to initialize a Redux store
  */
-export function reducer(appReducer, initialUI = {}, options = {}) {
+export function reducer(initialUI = {}, options = {}) {
 
   const initialState = fromJS({ui: initialUI}, function (key, value) {
     var isIndexed = Iterable.isIndexed(value);
@@ -38,7 +38,7 @@ export function reducer(appReducer, initialUI = {}, options = {}) {
         nextState = state.setIn(action.pathArray.concat(['props', 'value']), action.val);
         break;
       default:
-        nextState = appReducer(state, action);
+        nextState = state;
         break;
     }
     return nextState;

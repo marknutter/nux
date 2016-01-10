@@ -24,9 +24,9 @@ import {createStore, compose, applyMiddleware} from 'redux';
 import utils from './utils';
 import {renderUI} from './ui';
 import {reducer} from './reducer';
-import {fromJS, Map} from 'immutable';
+import {fromJS, Map, Iterable} from 'immutable';
 import Rlite from 'rlite-router';
-
+import reduceReducers from 'reduce-reducers';
 
 var nux = window.nux = module.exports = {
   init: init,
@@ -59,61 +59,70 @@ var nux = window.nux = module.exports = {
  * @return {Store} Redux store where app state is maintained.
  */
 function init(appReducer, actionCreators = {}, options = nux.options, elem = document.body) {
-  let initialState = options.initialUI ? fromJS(options.initialUI) : fromJS({div: {}});
-  if (options.localStorage && localStorage.getItem('nux')) {
-    initialState = JSON.parse(localStorage.getItem('nux'));
-  };
 
-  delegator();
+  return (initialUI = {div: {}}) => {
 
+    let initialState = initialUI;
+    if (options.localStorage && localStorage.getItem('nux')) {
+      initialState = JSON.parse(localStorage.getItem('nux'));
+    };
 
-  let router = Rlite();
-  let middleWare = [thunkMiddleware];
-  if (options.logActions) {
-    middleWare.push(createLogger({
-      stateTransformer: (state) => {
-        return state.toJS();
-      }
-    }));
-  }
-  const createStoreWithMiddleware = applyMiddleware.apply(this, middleWare)(createStore);
-  let store = createStoreWithMiddleware(reducer(appReducer, initialState, options));
-  let currentUI = store.getState().get('ui').toVNode(store);
-  let rootNode = createElement(currentUI);
-  elem.appendChild(rootNode);
+    delegator();
 
-  store.getActionCreator = function(actionName) {
-    return actionCreators[actionName];
-  }
+    let router = Rlite();
+    let middleWare = [thunkMiddleware];
+    if (options.logActions) {
+      middleWare.push(createLogger({
+        stateTransformer: (state) => {
+          return state.toJS();
+        }
+      }));
+    }
 
-  if (store.getState().get('routes')) {
-    store.getState().get('routes').forEach((action, route) => {
-      router.add(route, (r) => {
-        store.dispatch(action.merge(Map(r)).toJS());
+    let finalAppReducer = typeof appReducer === 'function' ? appReducer : combineReducers(appReducer);
+
+    let finalReducer = reduceReducers(reducer(initialState, options), finalAppReducer);
+
+    const createStoreWithMiddleware = applyMiddleware.apply(this, middleWare)(createStore);
+    let store = createStoreWithMiddleware(finalReducer);
+    let currentUI = store.getState().get('ui').toVNode(store);
+    let rootNode = createElement(currentUI);
+    elem.appendChild(rootNode);
+
+    store.getActionCreator = function(actionName) {
+      return actionCreators[actionName];
+    }
+
+    if (store.getState().get('routes')) {
+      store.getState().get('routes').forEach((action, route) => {
+        router.add(route, (r) => {
+          store.dispatch(action.merge(Map(r)).toJS());
+        });
       });
+
+      function processHash() {
+        var hash = location.hash || '#';
+        router.run(hash.slice(1));
+      }
+
+      window.addEventListener('hashchange', processHash);
+      processHash();
+    }
+
+    store.subscribe(() => {
+      const ui = store.getState().get('ui');
+      if (options.localStorage) {
+        localStorage.setItem('nux', JSON.stringify(ui ? ui.toJS() : {}));
+      }
+      var newUI = store.getState().get('ui').toVNode(store);
+      var patches = diff(currentUI, newUI);
+      rootNode = patch(rootNode, patches);
+      currentUI = newUI;
     });
 
-    function processHash() {
-      var hash = location.hash || '#';
-      router.run(hash.slice(1));
-    }
+    return store;
 
-    window.addEventListener('hashchange', processHash);
-    processHash();
   }
-
-  store.subscribe(() => {
-    const ui = store.getState().get('ui');
-    if (options.localStorage) {
-      localStorage.setItem('nux', JSON.stringify(ui ? ui.toJS() : {}));
-    }
-    var newUI = store.getState().get('ui').toVNode(store);
-    var patches = diff(currentUI, newUI);
-    rootNode = patch(rootNode, patches);
-    currentUI = newUI;
-  });
-
-  return store;
 }
 
 
