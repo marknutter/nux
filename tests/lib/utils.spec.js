@@ -17,22 +17,22 @@ describe('the Nux utility ', () => {
 
     it("should turn a selector string into a path array with 'children' strings separating any tags", () => {
       expect(selector('div#foo form#bar input#baz'))
-        .toEqual(['div#foo', 'children', 'form#bar', 'children', 'input#baz']);
+        .toEqual(['div#foo', 'form#bar', 'input#baz']);
     });
 
     it("should return a trailing 'children' string if provided", () => {
       expect(selector('div#foo form#bar input#baz children'))
-        .toEqual(['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'children']);
+        .toEqual(['div#foo', 'form#bar', 'input#baz', 'children']);
     });
 
     it("should return props without interweaving 'children' strings", () => {
       expect(selector('div#foo form#bar input#baz props value'))
-        .toEqual(['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props', 'value']);
+        .toEqual(['div#foo', 'form#bar', 'input#baz', 'props', 'value']);
     });
 
     it("should return trailing 'props' string correctly", () => {
       expect(selector('div#foo form#bar input#baz props'))
-        .toEqual(['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props']);
+        .toEqual(['div#foo', 'form#bar', 'input#baz', 'props']);
     });
 
   });
@@ -43,25 +43,21 @@ describe('the Nux utility ', () => {
       tree = fromJS({
         ui: {
           'div#foo': {
-            children: {
-              'div.bar': {
-                children: {
-                  'span.baz': {
-                    props: {
-                      style: {
-                        color: 'white'
-                      }
-                    }
+            'div.bar': {
+              'span.baz': {
+                props: {
+                  style: {
+                    color: 'white'
                   }
                 }
-              },
-              'input.biz': {
-                props: {
-                  events: {
-                    'ev-click': {
-                      dispatch: {
-                        type: 'CLICK'
-                      }
+              }
+            },
+            'input.biz': {
+              props: {
+                events: {
+                  'ev-click': {
+                    dispatch: {
+                      type: 'CLICK'
                     }
                   }
                 }
@@ -93,12 +89,10 @@ describe('the Nux utility ', () => {
       it("should define the method children() which should allow the retrieval children of a vDom node", () => {
         expect(tree.$('ui div#foo').children().toJS()).toEqual({
           'div.bar': {
-            children: {
-              'span.baz': {
-                props: {
-                  style: {
-                    color: 'white'
-                  }
+            'span.baz': {
+              props: {
+                style: {
+                  color: 'white'
                 }
               }
             }
@@ -177,7 +171,7 @@ describe('the Nux utility ', () => {
       });
 
       it("should allow setting of a Nux vDom node's props", () => {
-        let expectedState = tree.setIn(['ui', 'div#foo', 'children', 'input.biz', 'props', 'placeholder'], 'type here');
+        let expectedState = tree.setIn(['ui', 'div#foo', 'input.biz', 'props', 'placeholder'], 'type here');
         expect(tree.$('ui div#foo input.biz').props('placeholder', 'type here').toJS()).toEqual(expectedState.toJS());
       });
 
@@ -186,7 +180,7 @@ describe('the Nux utility ', () => {
           'placeholder': 'type here',
           'value': 'hello world'
         }
-        let expectedState = tree.mergeIn(['ui', 'div#foo', 'children', 'input.biz', 'props'], Map(testprops));
+        let expectedState = tree.mergeIn(['ui', 'div#foo', 'input.biz', 'props'], Map(testprops));
         expect(tree.$('ui div#foo input.biz').props(testprops).toJS()).toEqual(expectedState.toJS());
       });
 
@@ -217,13 +211,13 @@ describe('the Nux utility ', () => {
       });
 
       it("should allow setting of a Nux vDom node's style", () => {
-        let expectedState = tree.setIn(['ui', 'div#foo', 'children', 'div.bar', 'children', 'span.baz', 'props', 'style', 'fontFamily'], 'helvetica')
+        let expectedState = tree.setIn(['ui', 'div#foo', 'div.bar', 'span.baz', 'props', 'style', 'fontFamily'], 'helvetica')
         expect(tree.$('ui div#foo div.bar span.baz').style('fontFamily', 'helvetica').toJS()).toEqual(expectedState.toJS());
       });
 
 
       it("should allow setting of multiple Nux vDom node styles", () => {
-        let expectedState = tree.mergeIn(['ui', 'div#foo', 'children', 'div.bar', 'children', 'span.baz', 'props', 'style'], Map({'fontFamily': 'helvetica', fontSize: '12px'}));
+        let expectedState = tree.mergeIn(['ui', 'div#foo', 'div.bar', 'span.baz', 'props', 'style'], Map({'fontFamily': 'helvetica', fontSize: '12px'}));
         expect(tree.$('ui div#foo div.bar span.baz').style({'fontFamily': 'helvetica', fontSize: '12px'}).toJS()).toEqual(expectedState.toJS());
       });
 
@@ -264,7 +258,7 @@ describe('the Nux utility ', () => {
             type: 'BLUR'
           }
         }
-        let expectedState = tree.setIn(['ui', 'div#foo', 'children', 'input.biz', 'props', 'events', 'ev-blur'], Map(testEvent));
+        let expectedState = tree.setIn(['ui', 'div#foo', 'input.biz', 'props', 'events', 'ev-blur'], Map(testEvent));
         expect(tree.$('ui div#foo input.biz').events('ev-blur', testEvent).toJS()).toEqual(expectedState.toJS());
       });
 
@@ -281,7 +275,7 @@ describe('the Nux utility ', () => {
             }
           }
         }
-        let expectedState = tree.mergeIn(['ui', 'div#foo', 'children', 'input.biz', 'props', 'events'], Map(testEvents));
+        let expectedState = tree.mergeIn(['ui', 'div#foo', 'input.biz', 'props', 'events'], Map(testEvents));
         expect(tree.$('ui div#foo input.biz').events(testEvents).toJS()).toEqual(expectedState.toJS());
       });
 

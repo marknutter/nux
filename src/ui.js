@@ -62,15 +62,15 @@ export function renderUI (store, ui, pathArray = List()) {
     props = props.get('events').reduce((oldProps, val, key) => {
       if (key.indexOf('ev-keyup') > -1) {
         registeredKeyEvents[key] = (e) => {
-          fireDispatch(store, val, event);
-          createAction(store, val, event);
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         };
         return oldProps;
       } else {
         return oldProps.set(key, (e) => {
           e.preventDefault();
-          fireDispatch(store, val, event);
-          createAction(store, val, event);
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         });
       }
     }, props).delete('events');

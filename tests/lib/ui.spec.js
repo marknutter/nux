@@ -24,19 +24,15 @@ describe('the Nux core ui renderer,', () => {
             fontFamily: 'helvetica'
           }
         },
-        children: {
-          'h1': {
-            props: {
-              style: {
-                fontSize: '20px'
-              }
-            }
-          },
-          'span': {
-            children: {
-              $text: 'foo'
+        'h1': {
+          props: {
+            style: {
+              fontSize: '20px'
             }
           }
+        },
+        'span': {
+          $text: 'foo'
         }
       }
     });
@@ -61,11 +57,9 @@ describe('the Nux core ui renderer,', () => {
       let renderedUI;
       const testUI = fromJS({
         'form#test': {
-          children: {
-            'input': {
-              props: {
-                placeholder: 'enter stuff'
-              }
+          'input': {
+            props: {
+              placeholder: 'enter stuff'
             }
           }
         }
@@ -100,7 +94,7 @@ describe('the Nux core ui renderer,', () => {
       expect(mockStore.dispatch).toHaveBeenCalledWith({
         type: '_UPDATE_INPUT_VALUE',
         val: 'foo',
-        pathArray: ['ui', 'form#test', 'children', 'input']
+        pathArray: ['ui', 'form#test', 'input']
       });
     });
 
@@ -132,7 +126,7 @@ describe('the Nux core ui renderer,', () => {
       expect(renderedUI).toEqual(h('div#test', { 'ev-click': jasmine.any(Function) }));
     });
 
-    it("should dispatch a _CUSTOM_ACTION action when the given node's callback function is invoked", () => {
+    it("should dispatch a CUSTOM_ACTION action when the given node's callback function is invoked", () => {
       let mockEvent = {
         preventDefault: jasmine.createSpy('preventDefault')
       };

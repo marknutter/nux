@@ -63,6 +63,7 @@ function init(appReducer, actionCreators = {}, options = nux.options, elem = doc
   return (initialUI = {div: {}}) => {
 
     let initialState = initialUI;
+    console.log("options.localStorage", options.localStorage);
     if (options.localStorage && localStorage.getItem('nux')) {
       initialState = JSON.parse(localStorage.getItem('nux'));
     };

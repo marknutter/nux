@@ -5,6 +5,7 @@ import {Map, fromJS, Iterable, OrderedMap} from 'immutable';
 describe('the Nux core reducer, when provided a separate reducer,', () => {
 
   let testReducer;
+  const initialState = Map();
   let providedReducer = function(state, action) {
     switch(action.type) {
       case 'TEST_ACTION':
@@ -15,11 +16,11 @@ describe('the Nux core reducer, when provided a separate reducer,', () => {
   }
 
   beforeEach(() => {
-    testReducer = reducer(providedReducer);
+    testReducer = reducer(initialState);
   });
 
   describe("when handling an action that is not defined,", () => {
-    const initialState = Map();
+
     let action, newState;
 
     beforeEach(() => {
@@ -34,24 +35,7 @@ describe('the Nux core reducer, when provided a separate reducer,', () => {
     });
   });
 
-  describe("when handling the provided action 'TEST_ACTION', ", () => {
-    const initialState = Map();
-    let action, newState;
 
-    beforeEach(() => {
-      action = {
-        type: 'TEST_ACTION'
-      }
-      newState = testReducer(initialState, action);
-    })
-
-
-    it ("should return a new state reduced by the provided action", () => {
-      expect(newState.toJS()).toEqual({
-        foo: 'bar'
-      });
-    });
-  });
 
   describe('when handling the core action', () => {
 
