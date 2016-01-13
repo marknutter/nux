@@ -1,7 +1,7 @@
 import {fromJS, Map, List, Iterable} from 'immutable';
 import h from 'virtual-dom/h';
 import {createStore} from 'redux';
-import {renderUI} from './../../lib/ui';
+import {renderUI} from './../../src/ui';
 
 
 
@@ -24,19 +24,15 @@ describe('the Nux core ui renderer,', () => {
             fontFamily: 'helvetica'
           }
         },
-        children: {
-          'h1': {
-            props: {
-              style: {
-                fontSize: '20px'
-              }
-            }
-          },
-          'span': {
-            children: {
-              $text: 'foo'
+        'h1': {
+          props: {
+            style: {
+              fontSize: '20px'
             }
           }
+        },
+        'span': {
+          $text: 'foo'
         }
       }
     });
@@ -61,11 +57,9 @@ describe('the Nux core ui renderer,', () => {
       let renderedUI;
       const testUI = fromJS({
         'form#test': {
-          children: {
-            'input': {
-              props: {
-                placeholder: 'enter stuff'
-              }
+          'input': {
+            props: {
+              placeholder: 'enter stuff'
             }
           }
         }
@@ -100,14 +94,14 @@ describe('the Nux core ui renderer,', () => {
       expect(mockStore.dispatch).toHaveBeenCalledWith({
         type: '_UPDATE_INPUT_VALUE',
         val: 'foo',
-        pathArray: ['ui', 'form#test', 'children', 'input']
+        pathArray: ['ui', 'form#test', 'input']
       });
     });
 
 
   });
 
-  describe('when given a Nux DOM Object with given a node containing a custom event,', () => {
+  describe('when given a Nux DOM Object with given a node containing a custom event with custom action,', () => {
 
     let renderedUI;
     const testUI = fromJS({
@@ -132,13 +126,53 @@ describe('the Nux core ui renderer,', () => {
       expect(renderedUI).toEqual(h('div#test', { 'ev-click': jasmine.any(Function) }));
     });
 
-    it("should dispatch a _CUSTOM_ACTION action when the given node's callback function is invoked", () => {
+    it("should dispatch a CUSTOM_ACTION action when the given node's callback function is invoked", () => {
       let mockEvent = {
         preventDefault: jasmine.createSpy('preventDefault')
       };
       renderedUI.properties['ev-click'].value(mockEvent);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockStore.dispatch).toHaveBeenCalledWith({ type: 'CUSTOM_ACTION', event: mockEvent });
+    });
+
+
+  });
+
+  describe('when given a Nux DOM Object with given a node containing a custom event with custom action creator,', () => {
+
+    let renderedUI;
+    const testUI = fromJS({
+      'div#test': {
+        props: {
+          events: {
+            'ev-click': {
+              action: {
+                type: 'CUSTOM_ACTION_CREATOR',
+                foo: 'bar'
+              }
+            }
+          }
+        }
+      }
+    });
+
+    beforeEach(() => {
+      mockStore.CUSTOM_ACTION_CREATOR = jasmine.createSpy('CUSTOM_ACTION_CREATOR');
+      mockStore.getActionCreator = () => { return mockStore.CUSTOM_ACTION_CREATOR };
+      renderedUI = renderUI(mockStore, testUI);
+    });
+
+    it("should dispatch a CUSTOM_ACTION action when the given node's callback function is invoked", () => {
+      let mockEvent = {
+        preventDefault: jasmine.createSpy('preventDefault')
+      };
+      renderedUI.properties['ev-click'].value(mockEvent);
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(mockStore.CUSTOM_ACTION_CREATOR).toHaveBeenCalledWith({
+        type: 'CUSTOM_ACTION_CREATOR',
+        foo: 'bar',
+        event: mockEvent
+      });
     });
 
 

@@ -12,6 +12,7 @@ var karma = require('karma').server;
 var uglify = require('gulp-uglify');
 var streamify = require('gulp-streamify');
 var rename = require("gulp-rename");
+var babel = require('gulp-babel');
 
 var config = {
   simpleTodoEntryFile: './example/simple-todo/todo-app.js',
@@ -22,6 +23,9 @@ var config = {
   todoMVCOutputDir: './example/todo-mvc/dist/',
   todoMVCDir: './example/todo-mvc/',
   todoMVCOutputFile: 'todo-mvc.js',
+  nuxMinifiedOutputFile: 'nux.js',
+  nuxMinifiedOutputDir: './',
+  nuxMinifiedEntryFile: './lib/index.js',
   nuxOutputFile: 'nux.js',
   nuxOutputDir: './',
   nuxEntryFile: './lib/index.js'
@@ -47,7 +51,7 @@ function bundle(prefix) {
     .pipe(reload({ stream: true }));
 }
 
-gulp.task('build-nux', function() {
+gulp.task('build-nux-minified', function() {
   browserify(config.nuxEntryFile)
   .transform(babelify)
   .bundle()
@@ -61,13 +65,12 @@ gulp.task('build-nux', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('build-hello-world', function() {
-  browserify('./hello-world.js')
-  .transform(babelify)
-  .bundle()
-  .on('error', function(err) { console.log('Error: ' + err.message); })
-  .pipe(source('./hello-world.js'))
-  .pipe(gulp.dest('./assets/scripts/'))
+gulp.task('build-nux', function() {
+  return gulp.src('src/**/*.js')
+    .pipe(babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest('lib'));
 });
 
 gulp.task('watch-simple-todo', function(cb) {
@@ -88,7 +91,7 @@ gulp.task('watch-simple-todo', function(cb) {
 });
 
 gulp.task('build-simple-todo', ['clean-simple-todo'], function() {
-  return bundle('todoTodo')
+  return bundle('simpleTodo')
 });
 
 gulp.task('clean-simple-todo', function(cb){

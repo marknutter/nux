@@ -1,5 +1,5 @@
 import {addTodo, toggleTodo, toggleAllTodos, showTodos, clearCompletedTodos, deleteTodo, showEditTodo, editTodo, cancelEditTodo} from './todo-mvc-reducers';
-import {init} from './../../../lib/index';
+import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
 let routes = {
@@ -17,7 +17,7 @@ let routes = {
   }
 }
 
-let store = init((state, action) => {
+let todoMvc = init((state, action) => {
   switch (action.type) {
     case 'ADD_TODO':
       return addTodo(state, action.event);
@@ -39,11 +39,7 @@ let store = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, todoMvcUi, {localStorage: true, logActions: true, routes: routes});
+}, {}, {localStorage: false, logActions: true, routes: routes});
 
-// let currentView = window.location.hash.split("#/")[1] || 'all';
+todoMvc(todoMvcUi);
 
-// store.dispatch({
-//   type: 'SHOW_TODOS',
-//   view: currentView
-// })
