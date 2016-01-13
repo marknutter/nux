@@ -14,8 +14,6 @@ Nux combines [redux](http://redux.js.org), [virtual-dom](https://github.com/Matt
 
 ```js
 import init from 'nux';
-import {selector} from 'nux/utils';
-
 
 init(
 
@@ -24,9 +22,9 @@ init(
 (state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
-    const inputVal = selector('div#hw input props value');
-    return state.setIn(selector('div#hw h5 $text'), state.getIn(inputVal))
-                .setIn(inputVal, '');
+    const inputVal = state.$('div#hw input').props('value');
+    return state.$('div#hw h5 $text'), inputVal)
+                .$('div#hw input').props('value', '');
   }
   return state;
 },
@@ -35,17 +33,15 @@ init(
 // second argument is your initial app UI state represented as a Nux vDom object
 {
   'div#hw': {
-    children: {
-      'h5': {
-      },
-      'input': {
-        props: {
-          placeholder: 'type and hit enter..',
-            events: {
-            'ev-keyup-13': {
-              dispatch: {
-                type: 'SUBMIT_STATEMENT'
-              }
+    'h5': {
+    },
+    'input': {
+      props: {
+        placeholder: 'type and hit enter..',
+          events: {
+          'ev-keyup-13': {
+            dispatch: {
+              type: 'SUBMIT_STATEMENT'
             }
           }
         }
