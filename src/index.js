@@ -63,7 +63,6 @@ function init(appReducer, actionCreators = {}, options = nux.options, elem = doc
   return (initialUI = {div: {}}) => {
 
     let initialState = initialUI;
-    console.log("options.localStorage", options.localStorage);
     if (options.localStorage && localStorage.getItem('nux')) {
       initialState = JSON.parse(localStorage.getItem('nux'));
     };
@@ -91,6 +90,9 @@ function init(appReducer, actionCreators = {}, options = nux.options, elem = doc
     elem.appendChild(rootNode);
 
     store.getActionCreator = function(actionName) {
+      if (actionCreators[actionName] === undefined) {
+        throw new Error(`AtionCreatorNotFoundError: no action creator has been specified for the key ${actionName}`);
+      }
       return actionCreators[actionName];
     }
 
