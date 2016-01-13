@@ -24,9 +24,9 @@ import {createStore, compose, applyMiddleware} from 'redux';
 import utils from './utils';
 import {renderUI} from './ui';
 import {reducer} from './reducer';
-import {fromJS, Map} from 'immutable';
+import {fromJS, Map, Iterable} from 'immutable';
 import Rlite from 'rlite-router';
-
+import reduceReducers from 'reduce-reducers';
 
 var nux = window.nux = module.exports = {
   init: init,
@@ -58,59 +58,74 @@ var nux = window.nux = module.exports = {
  * @param {Element} [elem=HTMLBodyElement] The element into which the nux application will be rendered.
  * @return {Store} Redux store where app state is maintained.
  */
-function init(appReducer, initialUI = fromJS({div: {}}), options = nux.options, elem = document.body) {
-  let initialState = initialUI;
-  if (options.localStorage && localStorage.getItem('nux')) {
-    initialState = JSON.parse(localStorage.getItem('nux'));
-  };
+function init(appReducer, actionCreators = {}, options = nux.options, elem = document.body) {
 
-  delegator();
+  return (initialUI = {div: {}}) => {
 
+    let initialState = initialUI;
+    if (options.localStorage && localStorage.getItem('nux')) {
+      initialState = JSON.parse(localStorage.getItem('nux'));
+    };
 
-  let router = Rlite();
-  let middleWare = [thunkMiddleware];
-  if (options.logActions) {
-    middleWare.push(createLogger({
-      stateTransformer: (state) => {
-        return state.toJS();
+    delegator();
+
+    let router = Rlite();
+    let middleWare = [thunkMiddleware];
+    if (options.logActions) {
+      middleWare.push(createLogger({
+        stateTransformer: (state) => {
+          return state.toJS();
+        }
+      }));
+    }
+
+    let finalAppReducer = typeof appReducer === 'function' ? appReducer : combineReducers(appReducer);
+
+    let finalReducer = reduceReducers(reducer(initialState, options), finalAppReducer);
+
+    const createStoreWithMiddleware = applyMiddleware.apply(this, middleWare)(createStore);
+    let store = createStoreWithMiddleware(finalReducer);
+    let currentUI = store.getState().get('ui').toVNode(store);
+    let rootNode = createElement(currentUI);
+    elem.appendChild(rootNode);
+
+    store.getActionCreator = function(actionName) {
+      if (actionCreators[actionName] === undefined) {
+        throw new Error(`AtionCreatorNotFoundError: no action creator has been specified for the key ${actionName}`);
       }
-    }));
-  }
-  const createStoreWithMiddleware = applyMiddleware.apply(this, middleWare)(createStore);
-  let store = createStoreWithMiddleware(reducer(appReducer, initialState, options));
-  let currentUI = store.getState().get('ui').toVNode(store);
-  let rootNode = createElement(currentUI);
+      return actionCreators[actionName];
+    }
 
-  elem.appendChild(rootNode);
-
-  if (store.getState().get('routes')) {
-    store.getState().get('routes').forEach((action, route) => {
-      router.add(route, (r) => {
-        store.dispatch(action.merge(Map(r)).toJS());
+    if (store.getState().get('routes')) {
+      store.getState().get('routes').forEach((action, route) => {
+        router.add(route, (r) => {
+          store.dispatch(action.merge(Map(r)).toJS());
+        });
       });
+
+      function processHash() {
+        var hash = location.hash || '#';
+        router.run(hash.slice(1));
+      }
+
+      window.addEventListener('hashchange', processHash);
+      processHash();
+    }
+
+    store.subscribe(() => {
+      const ui = store.getState().get('ui');
+      if (options.localStorage) {
+        localStorage.setItem('nux', JSON.stringify(ui ? ui.toJS() : {}));
+      }
+      var newUI = store.getState().get('ui').toVNode(store);
+      var patches = diff(currentUI, newUI);
+      rootNode = patch(rootNode, patches);
+      currentUI = newUI;
     });
 
-    function processHash() {
-      var hash = location.hash || '#';
-      router.run(hash.slice(1));
-    }
+    return store;
 
-    window.addEventListener('hashchange', processHash);
-    processHash();
   }
-
-  store.subscribe(() => {
-    const ui = store.getState().get('ui');
-    if (options.localStorage) {
-      localStorage.setItem('nux', JSON.stringify(ui ? ui.toJS() : {}));
-    }
-    var newUI = store.getState().get('ui').toVNode(store);
-    var patches = diff(currentUI, newUI);
-    rootNode = patch(rootNode, patches);
-    currentUI = newUI;
-  });
-
-  return store;
 }
 
 

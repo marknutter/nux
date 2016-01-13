@@ -17,7 +17,7 @@ let routes = {
   }
 }
 
-let store = init((state, action) => {
+let todoMvc = init((state, action) => {
   switch (action.type) {
     case 'ADD_TODO':
       return addTodo(state, action.event);
@@ -39,6 +39,7 @@ let store = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, todoMvcUi, {localStorage: false, logActions: true, routes: routes});
+}, {}, {localStorage: false, logActions: true, routes: routes});
 
+todoMvc(todoMvcUi);
 

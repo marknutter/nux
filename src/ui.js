@@ -29,14 +29,15 @@ export function renderUI (store, ui, pathArray = List()) {
   let children = List(),
       props = node.get('props') || Map();
 
+  let childNodes = node.filterNot((val, key) => { return key === 'props' });
 
   // recurse through this node's children and render their UI as hyperscript
-  if (node.get('children')) {
-    children = node.get('children').map((childVal, childTagName) => {
+  if (childNodes) {
+    children = childNodes.map((childVal, childTagName) => {
       if (childTagName === '$text') {
         return new List([childVal]);
       } else {
-        return renderUI(store, (new Map()).set(childTagName, childVal), currentPathArray.concat(['children', childTagName]));
+        return renderUI(store, (new Map()).set(childTagName, childVal), currentPathArray.concat([childTagName]));
       }
     }).toList();
   }
@@ -61,13 +62,15 @@ export function renderUI (store, ui, pathArray = List()) {
     props = props.get('events').reduce((oldProps, val, key) => {
       if (key.indexOf('ev-keyup') > -1) {
         registeredKeyEvents[key] = (e) => {
-          store.dispatch(val.get('dispatch').merge(Map({event:e})).toJS());
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         };
         return oldProps;
       } else {
         return oldProps.set(key, (e) => {
           e.preventDefault();
-          store.dispatch(val.get('dispatch').merge(Map({event:e})).toJS());
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         });
       }
     }, props).delete('events');
@@ -77,4 +80,25 @@ export function renderUI (store, ui, pathArray = List()) {
   return h.apply(this, [tagName, props.toJS(), children.toJS()]);
 };
 
+function fireDispatch(store, val, event) {
+  if (val.get('dispatch')) {
+    store.dispatch(val.get('dispatch').merge(Map({event})).toJS());
+  }
+}
 
+function createAction(store, val, event) {
+  if (val.get('action')) {
+    // if the action is an object, pass that object along as the argument to the action creator
+    if (typeof val.getIn(['action', 'type']) === 'string') {
+      let actionCreator = store.getActionCreator(val.getIn(['action', 'type']))
+      let action = val.get('action').merge(Map({event})).toJS();
+      store.dispatch(actionCreator(action));
+    }
+    // if the action is just the action name, then fire it without any arguments
+    else if(typeof val.get('action') === 'string') {
+      let actionCreator = store.getActionCreator(val.get('action'));
+      let action = Map({type: val.get('action'), event}).toJS();
+      store.dispatch(actionCreator(action));
+    }
+  }
+}

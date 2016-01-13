@@ -29,7 +29,7 @@ module.exports = function(config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'tests/**/*.spec.js': ['browserify'],
-      'lib/**/*.js': ['browserify']
+      'src/**/*.js': ['browserify']
     },
 
     browserify: {
