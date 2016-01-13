@@ -27,7 +27,7 @@ Collection.prototype.children = function() {
   const tagName = this.findKey(() => { return true });
   let node = this.set(tagName, this.get(tagName) || new Map)
 
-  let children = this.get(tagName) && this.get(tagName).filterNot((key) => { key === 'props' }) || new Map();
+  let children = this.get(tagName) && this.get(tagName).filterNot((val, key) => { return key === 'props' }) || new Map();
   let props = this.getIn([tagName, 'props'])  || new Map();
   if (arguments.length === 0) {
     return children;

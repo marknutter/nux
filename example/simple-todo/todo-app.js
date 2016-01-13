@@ -2,7 +2,7 @@ import {submitTodo, toggleTodo} from './todo-reducers';
 import {init} from './../../src/index';
 import {todoUi} from './todo-ui'
 
-init((state, action) => {
+let todoApp = init((state, action) => {
   switch (action.type) {
     case 'SUBMIT_TODO':
       return submitTodo(state, action.title);
@@ -10,4 +10,6 @@ init((state, action) => {
       return toggleTodo(state, action.tag);
   }
   return state;
-}, todoUi, {localStorage: true, logActions: true});
+}, {}, {localStorage: true, logActions: true});
+
+todoApp(todoUi);
