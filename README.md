@@ -15,7 +15,7 @@ Nux combines [redux](http://redux.js.org), [virtual-dom](https://github.com/Matt
 ```js
 import init from 'nux';
 
-init(
+let helloWorld = init(
 
 
 // first argument is your reducer - the only concern that modifies your app's state
@@ -30,8 +30,22 @@ init(
 },
 
 
-// second argument is your initial app UI state represented as a Nux vDom object
-{
+// second argument are any custom action creators you want to specify
+{},
+
+
+// third argument is your options where you can enable action and state logging
+{logActions: true},
+
+
+// fourth argument is the dom element you want your Nux app to render inside of
+document.querySelector('#hello-world-container')
+
+);
+
+
+// call the app function with your initial UI object and let Nux handle it from there
+helloWorld({
   'div#hw': {
     'h5': {
     },
@@ -48,15 +62,5 @@ init(
       }
     }
   }
-},
-
-
-// third argument is your options where you can enable action and state logging
-{logActions: true},
-
-
-// fourth argument is the dom element you want your Nux app to render inside of
-document.querySelector('#hello-world-container')
-
-); // That's all she wrote!
+});
 ```
