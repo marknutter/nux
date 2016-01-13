@@ -134,6 +134,9 @@ function init(appReducer) {
     elem.appendChild(rootNode);
 
     store.getActionCreator = function (actionName) {
+      if (actionCreators[actionName] === undefined) {
+        throw new Error("AtionCreatorNotFoundError: no action creator has been specified for the key " + actionName);
+      }
       return actionCreators[actionName];
     };
 
@@ -306,15 +309,15 @@ function renderUI(store, ui) {
     props = props.get("events").reduce(function (oldProps, val, key) {
       if (key.indexOf("ev-keyup") > -1) {
         registeredKeyEvents[key] = function (e) {
-          fireDispatch(store, val, event);
-          createAction(store, val, event);
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         };
         return oldProps;
       } else {
         return oldProps.set(key, function (e) {
           e.preventDefault();
-          fireDispatch(store, val, event);
-          createAction(store, val, event);
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
         });
       }
     }, props)["delete"]("events");
@@ -396,8 +399,8 @@ _immutable.Collection.prototype.children = function () {
   });
   var node = this.set(tagName, this.get(tagName) || new _immutable.Map());
 
-  var children = this.get(tagName) && this.get(tagName).filterNot(function (key) {
-    key === "props";
+  var children = this.get(tagName) && this.get(tagName).filterNot(function (val, key) {
+    return key === "props";
   }) || new _immutable.Map();
   var props = this.getIn([tagName, "props"]) || new _immutable.Map();
   if (arguments.length === 0) {
