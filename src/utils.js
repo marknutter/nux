@@ -10,9 +10,7 @@ Collection.prototype.$ = function $(query, setVal) {
   let nodeVal, node;
 
   if (setVal !== undefined) {
-    nodeVal = this.setIn(selector(query), setVal);
-    node = (new Map()).set(tagName, nodeVal);
-    return node;
+    return this.setIn(selector(query), setVal);
   } else {
     nodeVal = this.getIn(selector(query));
     node = (new Map()).set(tagName, nodeVal);

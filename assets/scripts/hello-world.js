@@ -1,379 +1,51 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var init = require("./lib/index").init;
+var init = require("./src/index").init;
 
-var selector = require("./lib/utils").selector;
+var helloWorld = init(
 
-init(function (state, action) {
+// first argument is your reducer - the only concern that modifies your app's state
+function (state, action) {
   switch (action.type) {
     case "SUBMIT_STATEMENT":
-      var inputVal = selector("div#hw input props value");
-      return state.setIn(selector("div#hw h5 $text"), state.getIn(inputVal)).setIn(inputVal, "");
+      var inputVal = state.$("ui div#hw input").props("value");
+      return state.$("ui div#hw h5 $text", inputVal).$("ui div#hw input").props("value", "");
   }
   return state;
-}, {
+},
+
+// second argument are any custom action creators you want to specify
+{},
+
+// third argument is your options where you can enable action and state logging
+{ logActions: true },
+
+// fourth argument is the dom element you want your Nux app to render inside of
+document.querySelector("#hello-world-container"));
+
+// call the app function with your initial UI object and let Nux handle it from there
+helloWorld({
   "div#hw": {
-    children: {
-      h5: {},
-      input: {
-        props: {
-          placeholder: "type and hit enter..",
-          events: {
-            "ev-keyup-13": {
-              dispatch: {
-                type: "SUBMIT_STATEMENT"
-              }
+    h5: {},
+    input: {
+      props: {
+        placeholder: "type and hit enter..",
+        events: {
+          "ev-keyup-13": {
+            dispatch: {
+              type: "SUBMIT_STATEMENT"
             }
           }
         }
       }
     }
   }
-
-}, { logActions: true }, document.querySelector("#hello-world-container"));
-
-},{"./lib/index":2,"./lib/utils":5}],2:[function(require,module,exports){
-"use strict";
-
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-/** @module index */
-
-/* Type Definititions */
-
-/**
- * A Redux store.
- * @typedef {Object} Store
- * @property {Function} dispatch Dispatch a provided action with type to invoke a matching reducer.
- * @property {Function} getState Get the current global state.
- * @property {Function} subscribe Provide callback to be invoked every time an action is fired.
- * @property {Function} replaceReducer Replace an existing reducer with a new one.
- */
-
-var h = _interopRequire(require("virtual-dom/h"));
-
-var diff = _interopRequire(require("virtual-dom/diff"));
-
-var patch = _interopRequire(require("virtual-dom/patch"));
-
-var createElement = _interopRequire(require("virtual-dom/create-element"));
-
-var delegator = _interopRequire(require("dom-delegator"));
-
-var _redux = require("redux");
-
-var createStore = _redux.createStore;
-var compose = _redux.compose;
-
-var renderUI = require("./ui").renderUI;
-
-var reducer = require("./reducer").reducer;
-
-var _immutable = require("immutable");
-
-var fromJS = _immutable.fromJS;
-var Map = _immutable.Map;
-
-var Rlite = _interopRequire(require("rlite-router"));
-
-var nux = window.nux = module.exports = {
-  init: init,
-  options: {
-    localStorage: false,
-    logActions: false
-  }
-};
-
-/**
- * Used to initialize a new Nux application. Any reducer that is provided will be combined with Nux's built
- * in reducers. The initial UI is the base template for the application and is what will be rendered immediately
- * upon initialization. A number of options can be provided as documented, and any element can be specified into
- * which Nux will render the application, allowing for the running of multiple, disparate instances of Nux on
- * a given page. A Redux store is returned, although direct interaction with the store should be unnecessary.
- * Once initialized, any changes to the global state for a given Nux instance will be immediately reflected in
- * via an efficient patching mechanism via virtual-dom.
- *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Initialize a Nux application.
- *
- * @param {Function} appReducer The provided reducer function.
- * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
- * @param {Object} [options] Options to configure the nux application.
- * @param {Boolean} [options.localStorage=false] Enable caching of global state to localStorage.
- * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
- * @param {Element} [elem=HTMLBodyElement] The element into which the nux application will be rendered.
- * @return {Store} Redux store where app state is maintained.
- */
-function init(appReducer) {
-  var initialUI = arguments[1] === undefined ? fromJS({ div: {} }) : arguments[1];
-  var options = arguments[2] === undefined ? nux.options : arguments[2];
-  var elem = arguments[3] === undefined ? document.body : arguments[3];
-
-  var initialState = initialUI;
-  if (options.localStorage && localStorage.getItem("nux")) {
-    initialState = JSON.parse(localStorage.getItem("nux"));
-  };
-
-  delegator();
-
-  var router = Rlite();
-  var store = createStore(reducer(appReducer, initialState, options));
-  var currentUI = renderUI(store, store.getState().get("ui"));
-  var rootNode = createElement(currentUI);
-  elem.appendChild(rootNode);
-
-  if (store.getState().get("routes")) {
-    var processHash = function () {
-      var hash = location.hash || "#";
-      router.run(hash.slice(1));
-    };
-
-    store.getState().get("routes").forEach(function (action, route) {
-      router.add(route, function (r) {
-        store.dispatch(action.merge(Map(r)).toJS());
-      });
-    });
-
-    window.addEventListener("hashchange", processHash);
-    processHash();
-  }
-
-  store.subscribe(function () {
-    var ui = store.getState().get("ui");
-    if (options.localStorage) {
-      localStorage.setItem("nux", JSON.stringify(ui ? ui.toJS() : {}));
-    }
-    var newUI = renderUI(store, ui);
-    var patches = diff(currentUI, newUI);
-    rootNode = patch(rootNode, patches);
-    currentUI = newUI;
-  });
-
-  return store;
-}
-
-},{"./reducer":3,"./ui":4,"dom-delegator":10,"immutable":22,"redux":24,"rlite-router":32,"virtual-dom/create-element":33,"virtual-dom/diff":34,"virtual-dom/h":35,"virtual-dom/patch":43}],3:[function(require,module,exports){
-
-
-/**
- * Create a reducer using a provided reducer combined with Nux's internal reducer. An initial vDOM UI object
- * can be passed in to initialize the store with, as well as any options to further configure the reducer.
- * The reducer returned is intended for use with a Redux store.
- *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Generate a Nux reducer function given a custom reducer function.
- *
- * @param {Function} appReducer The provided reducer function.
- * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
- * @param {Object} [options] Options to configure the generated reducer.
- * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
- * @return {Function} Reducer function to be used to initialize a Redux store
- */
-"use strict";
-
-exports.reducer = reducer;
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/** @module reducer */
-
-/**
- * An Immutable Map.
- * @typedef {Object} Map
- */
-
-var _immutable = require("immutable");
-
-var fromJS = _immutable.fromJS;
-var Iterable = _immutable.Iterable;
-var Map = _immutable.Map;
-
-function reducer(appReducer) {
-  var initialUI = arguments[1] === undefined ? {} : arguments[1];
-  var options = arguments[2] === undefined ? {} : arguments[2];
-
-  var initialState = fromJS({ ui: initialUI }, function (key, value) {
-    var isIndexed = Iterable.isIndexed(value);
-    return isIndexed ? value.toList() : value.toOrderedMap();
-  }).merge(options.routes ? fromJS({ routes: options.routes }) : {});
-
-  return function (_x3, action) {
-    var state = arguments[0] === undefined ? initialState : arguments[0];
-
-    var nextState = undefined;
-    switch (action.type) {
-      case "_UPDATE_INPUT_VALUE":
-        nextState = state.setIn(action.pathArray.concat(["props", "value"]), action.val);
-        break;
-      default:
-        nextState = appReducer(state, action);
-        break;
-    }
-    if (options.logActions) {
-      storeAndLogState(action, nextState, state);
-    }
-    return nextState;
-  };
-}
-
-/**
- * Log the previous state, an action, and the new state that resulted from that action
- *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Advance state change logging.
- *
- * @param {Object} action The redux action object.
- * @param {Object} action.type The redux action type.
- * @param {Map} nextState The state resulting from having performed the given action
- * @param {Map} prevState The state as it was before the given action was performed
- */
-function storeAndLogState(action, nextState, prevState) {
-  var nextStateJS = nextState.toJS();
-  console.log("\n----------------------------------------------------------------\nACTION TAKEN   ", action, "\nNEW STATE      ", nextStateJS, "\nPREVIOUS STATE ", prevState.toJS(), "\n----------------------------------------------------------------");
-}
-
-},{"immutable":22}],4:[function(require,module,exports){
-"use strict";
-
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-/**
- * Accepts a Nux vDOM object and returns a VirtualNode. The vDOM object's 'children' are recursively converted
- * to VirtualNodes. The 'props' for any given are modified such that any custom events are assigned callbacks
- * which dispatch the associated actions. The Nux default event handlers are also added to the 'props' object
- * for a given node. This is where all the magic happens, folks.
- *
- * @author Mark Nutter <marknutter@gmail.com>
- *
- * @param {Store} store A redux store
- * @param {Object} ui The Nux vDOM object to be recursively converted into a VirtualNode
- * @param {Array} [pathArray] The location of the provided vDOM object within another vDOM object (if applicable)
- * @return {Store} Redux store where app state is maintained.
- */
-exports.renderUI = renderUI;
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/** @module ui */
-
-var h = _interopRequire(require("virtual-dom/h"));
-
-var _immutable = require("immutable");
-
-var fromJS = _immutable.fromJS;
-var Map = _immutable.Map;
-var List = _immutable.List;
-var Iterable = _immutable.Iterable;
-
-function renderUI(store, ui) {
-  var pathArray = arguments[2] === undefined ? List() : arguments[2];
-
-  // ui objects come as a key/value pair so extract the key as the tag name and value as the node data
-  var tagName = ui.findKey(function () {
-    return true;
-  });
-  var node = ui.get(tagName);
-
-  // keep track of our current location in the ui vDOM object
-  var currentPathArray = pathArray.size === 0 ? pathArray.push(tagName) : pathArray;
-  var children = List(),
-      props = node.get("props") || Map();
-
-  // recurse through this node's children and render their UI as hyperscript
-  if (node.get("children")) {
-    children = node.get("children").map(function (childVal, childTagName) {
-      if (childTagName === "$text") {
-        return new List([childVal]);
-      } else {
-        return renderUI(store, new Map().set(childTagName, childVal), currentPathArray.concat(["children", childTagName]));
-      }
-    }).toList();
-  }
-
-  // add an event handler to inputs that updates their 'val' prop node when changes are detected
-  var registeredKeyEvents = {};
-  if (tagName.indexOf("input") > -1) {
-    props = props.set("ev-keyup", function (e) {
-      e.preventDefault();
-      store.dispatch({
-        type: "_UPDATE_INPUT_VALUE",
-        val: e.target.value,
-        pathArray: ["ui"].concat(currentPathArray.toJS())
-      });
-      registeredKeyEvents["ev-keyup"] ? registeredKeyEvents["ev-keyup"](e) : false;
-      registeredKeyEvents["ev-keyup-" + e.keyCode] ? registeredKeyEvents["ev-keyup-" + e.keyCode](e) : false;
-    });
-  }
-
-  // for any custom events detected, add callbacks that dispatch provided actions
-  if (props.get("events")) {
-    props = props.get("events").reduce(function (oldProps, val, key) {
-      if (key.indexOf("ev-keyup") > -1) {
-        registeredKeyEvents[key] = function (e) {
-          store.dispatch(val.get("dispatch").merge(Map({ event: e })).toJS());
-        };
-        return oldProps;
-      } else {
-        return oldProps.set(key, function (e) {
-          e.preventDefault();
-          store.dispatch(val.get("dispatch").merge(Map({ event: e })).toJS());
-        });
-      }
-    }, props)["delete"]("events");
-  }
-
-  // combine tag, props, and children into an array of plain javascript objects and return hyperscript VirtualNode
-  return h.apply(this, [tagName, props.toJS(), children.toJS()]);
-}
-
-;
-
-},{"immutable":22,"virtual-dom/h":35}],5:[function(require,module,exports){
-/** @module utils */
-
-/**
- * Returns an array path that can be used to deeply select inside of Nux. 'children' strings
- * will be interleaved between tag strings while all nodes from 'props' and onward will be
- * added in sequence. All returned arrays will include a leading 'ui' node.
- *
- * @example
- * selector('div#foo form#bar input#baz props value');
- * // returns ['ui', 'div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props', 'value']
- *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Generate a Nux reducer function given a custom reducer function.
- *
- * @param {String} selectorString
- * @return {Array} Path array used to deeply select inside of Immutable Nux vDOM objects
- */
-"use strict";
-
-exports.selector = selector;
-Object.defineProperty(exports, "__esModule", {
-  value: true
 });
 
-function selector(selectorString) {
-  var includeRoot = arguments[1] === undefined ? true : arguments[1];
+},{"./src/index":65}],2:[function(require,module,exports){
 
-  var domPathArray = selectorString.split(" props")[0].split(" ");
-  var fullDomPathArray = domPathArray.reduce(function (cur, val, index) {
-    return domPathArray.length === index + 1 ? val === "children" || val === "children" || val === "props" ? cur : cur.concat([val]) : cur.concat([val, "children"]);
-  }, []);
-  var toConcat = [];
-  if (selectorString.indexOf("props") > 0) {
-    var propsPathArray = selectorString.split("props")[1].split(" ");
-    toConcat = ["props"].concat(propsPathArray.slice(1));
-  }
-  return includeRoot ? ["ui"].concat(fullDomPathArray.concat(toConcat)) : fullDomPathArray.concat(toConcat);
-}
-
-;
-
-},{}],6:[function(require,module,exports){
-
-},{}],7:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -461,7 +133,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],8:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var EvStore = require("ev-store")
 
 module.exports = addEvent
@@ -481,7 +153,7 @@ function addEvent(target, type, handler) {
     }
 }
 
-},{"ev-store":12}],9:[function(require,module,exports){
+},{"ev-store":8}],5:[function(require,module,exports){
 var globalDocument = require("global/document")
 var EvStore = require("ev-store")
 var createStore = require("weakmap-shim/create-store")
@@ -670,7 +342,7 @@ function Handle() {
     this.type = "dom-delegator-handle"
 }
 
-},{"./add-event.js":8,"./proxy-event.js":20,"./remove-event.js":21,"ev-store":12,"global/document":15,"weakmap-shim/create-store":18}],10:[function(require,module,exports){
+},{"./add-event.js":4,"./proxy-event.js":16,"./remove-event.js":17,"ev-store":8,"global/document":11,"weakmap-shim/create-store":14}],6:[function(require,module,exports){
 var Individual = require("individual")
 var cuid = require("cuid")
 var globalDocument = require("global/document")
@@ -732,7 +404,7 @@ function Delegator(opts) {
 Delegator.allocateHandle = DOMDelegator.allocateHandle;
 Delegator.transformHandle = DOMDelegator.transformHandle;
 
-},{"./dom-delegator.js":9,"cuid":11,"global/document":15,"individual":16}],11:[function(require,module,exports){
+},{"./dom-delegator.js":5,"cuid":7,"global/document":11,"individual":12}],7:[function(require,module,exports){
 /**
  * cuid.js
  * Collision-resistant UID generator for browsers and node.
@@ -844,7 +516,7 @@ Delegator.transformHandle = DOMDelegator.transformHandle;
 
 }(this.applitude || this));
 
-},{}],12:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var OneVersionConstraint = require('individual/one-version');
@@ -866,7 +538,7 @@ function EvStore(elem) {
     return hash;
 }
 
-},{"individual/one-version":14}],13:[function(require,module,exports){
+},{"individual/one-version":10}],9:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -889,7 +561,7 @@ function Individual(key, value) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var Individual = require('./index.js');
@@ -913,7 +585,7 @@ function OneVersion(moduleName, version, defaultValue) {
     return Individual(key, defaultValue);
 }
 
-},{"./index.js":13}],15:[function(require,module,exports){
+},{"./index.js":9}],11:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -932,7 +604,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":6}],16:[function(require,module,exports){
+},{"min-document":2}],12:[function(require,module,exports){
 (function (global){
 var root = typeof window !== 'undefined' ?
     window : typeof global !== 'undefined' ?
@@ -954,7 +626,7 @@ function Individual(key, value) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -979,7 +651,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var hiddenStore = require('./hidden-store.js');
 
 module.exports = createStore;
@@ -1000,7 +672,7 @@ function createStore() {
     };
 }
 
-},{"./hidden-store.js":19}],19:[function(require,module,exports){
+},{"./hidden-store.js":15}],15:[function(require,module,exports){
 module.exports = hiddenStore;
 
 function hiddenStore(obj, key) {
@@ -1018,7 +690,7 @@ function hiddenStore(obj, key) {
     return store;
 }
 
-},{}],20:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var inherits = require("inherits")
 
 var ALL_PROPS = [
@@ -1098,7 +770,7 @@ function KeyEvent(ev) {
 
 inherits(KeyEvent, ProxyEvent)
 
-},{"inherits":17}],21:[function(require,module,exports){
+},{"inherits":13}],17:[function(require,module,exports){
 var EvStore = require("ev-store")
 
 module.exports = removeEvent
@@ -1119,7 +791,7 @@ function removeEvent(target, type, handler) {
     }
 }
 
-},{"ev-store":12}],22:[function(require,module,exports){
+},{"ev-store":8}],18:[function(require,module,exports){
 /**
  *  Copyright (c) 2014-2015, Facebook, Inc.
  *  All rights reserved.
@@ -6080,7 +5752,208 @@ function removeEvent(target, type, handler) {
   return Immutable;
 
 }));
-},{}],23:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
+"use strict";
+
+exports.__esModule = true;
+exports["default"] = reduceReducers;
+
+function reduceReducers() {
+  for (var _len = arguments.length, reducers = Array(_len), _key = 0; _key < _len; _key++) {
+    reducers[_key] = arguments[_key];
+  }
+
+  return function (previous, current) {
+    return reducers.reduce(function (p, r) {
+      return r(p, current);
+    }, previous);
+  };
+}
+
+module.exports = exports["default"];
+},{}],20:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var repeat = function repeat(str, times) {
+  return new Array(times + 1).join(str);
+};
+var pad = function pad(num, maxLength) {
+  return repeat("0", maxLength - num.toString().length) + num;
+};
+var formatTime = function formatTime(time) {
+  return " @ " + pad(time.getHours(), 2) + ":" + pad(time.getMinutes(), 2) + ":" + pad(time.getSeconds(), 2) + "." + pad(time.getMilliseconds(), 3);
+};
+
+// Use the new performance api to get better precision if available
+var timer = typeof performance !== "undefined" && typeof performance.now === "function" ? performance : Date;
+
+/**
+ * Creates logger with followed options
+ *
+ * @namespace
+ * @property {object} options - options for logger
+ * @property {string} options.level - console[level]
+ * @property {boolean} options.duration - print duration of each action?
+ * @property {boolean} options.timestamp - print timestamp with each action?
+ * @property {object} options.colors - custom colors
+ * @property {object} options.logger - implementation of the `console` API
+ * @property {boolean} options.logErrors - should errors in action execution be caught, logged, and re-thrown?
+ * @property {boolean} options.collapsed - is group collapsed?
+ * @property {boolean} options.predicate - condition which resolves logger behavior
+ * @property {function} options.stateTransformer - transform state before print
+ * @property {function} options.actionTransformer - transform action before print
+ * @property {function} options.errorTransformer - transform error before print
+ */
+
+function createLogger() {
+  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  return function (_ref) {
+    var getState = _ref.getState;
+    return function (next) {
+      return function (action) {
+        var _options$level = options.level;
+        var level = _options$level === undefined ? "log" : _options$level;
+        var _options$logger = options.logger;
+        var logger = _options$logger === undefined ? window.console : _options$logger;
+        var _options$logErrors = options.logErrors;
+        var logErrors = _options$logErrors === undefined ? true : _options$logErrors;
+        var collapsed = options.collapsed;
+        var predicate = options.predicate;
+        var _options$duration = options.duration;
+        var duration = _options$duration === undefined ? false : _options$duration;
+        var _options$timestamp = options.timestamp;
+        var timestamp = _options$timestamp === undefined ? true : _options$timestamp;
+        var transformer = options.transformer;
+        var _options$stateTransfo = options.stateTransformer;
+        var // deprecated
+        stateTransformer = _options$stateTransfo === undefined ? function (state) {
+          return state;
+        } : _options$stateTransfo;
+        var _options$actionTransf = options.actionTransformer;
+        var actionTransformer = _options$actionTransf === undefined ? function (actn) {
+          return actn;
+        } : _options$actionTransf;
+        var _options$errorTransfo = options.errorTransformer;
+        var errorTransformer = _options$errorTransfo === undefined ? function (error) {
+          return error;
+        } : _options$errorTransfo;
+        var _options$colors = options.colors;
+        var colors = _options$colors === undefined ? {
+          title: function title() {
+            return "#000000";
+          },
+          prevState: function prevState() {
+            return "#9E9E9E";
+          },
+          action: function action() {
+            return "#03A9F4";
+          },
+          nextState: function nextState() {
+            return "#4CAF50";
+          },
+          error: function error() {
+            return "#F20404";
+          }
+        } : _options$colors;
+
+        // exit if console undefined
+
+        if (typeof logger === "undefined") {
+          return next(action);
+        }
+
+        // exit early if predicate function returns false
+        if (typeof predicate === "function" && !predicate(getState, action)) {
+          return next(action);
+        }
+
+        if (transformer) {
+          console.error("Option 'transformer' is deprecated, use stateTransformer instead");
+        }
+
+        var started = timer.now();
+        var prevState = stateTransformer(getState());
+
+        var formattedAction = actionTransformer(action);
+        var returnedValue = undefined;
+        var error = undefined;
+        if (logErrors) {
+          try {
+            returnedValue = next(action);
+          } catch (e) {
+            error = errorTransformer(e);
+          }
+        } else {
+          returnedValue = next(action);
+        }
+
+        var took = timer.now() - started;
+        var nextState = stateTransformer(getState());
+
+        // message
+        var time = new Date();
+        var isCollapsed = typeof collapsed === "function" ? collapsed(getState, action) : collapsed;
+
+        var formattedTime = formatTime(time);
+        var titleCSS = colors.title ? "color: " + colors.title(formattedAction) + ";" : null;
+        var title = "action " + formattedAction.type + (timestamp ? formattedTime : "") + (duration ? " in " + took.toFixed(2) + " ms" : "");
+
+        // render
+        try {
+          if (isCollapsed) {
+            if (colors.title) logger.groupCollapsed("%c " + title, titleCSS);else logger.groupCollapsed(title);
+          } else {
+            if (colors.title) logger.group("%c " + title, titleCSS);else logger.group(title);
+          }
+        } catch (e) {
+          logger.log(title);
+        }
+
+        if (colors.prevState) logger[level]("%c prev state", "color: " + colors.prevState(prevState) + "; font-weight: bold", prevState);else logger[level]("prev state", prevState);
+
+        if (colors.action) logger[level]("%c action", "color: " + colors.action(formattedAction) + "; font-weight: bold", formattedAction);else logger[level]("action", formattedAction);
+
+        if (error) {
+          if (colors.error) logger[level]("%c error", "color: " + colors.error(error, prevState) + "; font-weight: bold", error);else logger[level]("error", error);
+        } else {
+          if (colors.nextState) logger[level]("%c next state", "color: " + colors.nextState(nextState) + "; font-weight: bold", nextState);else logger[level]("next state", nextState);
+        }
+
+        try {
+          logger.groupEnd();
+        } catch (e) {
+          logger.log("—— log end ——");
+        }
+
+        if (error) throw error;
+        return returnedValue;
+      };
+    };
+  };
+}
+
+exports.default = createLogger;
+module.exports = exports['default'];
+},{}],21:[function(require,module,exports){
+'use strict';
+
+function thunkMiddleware(_ref) {
+  var dispatch = _ref.dispatch;
+  var getState = _ref.getState;
+
+  return function (next) {
+    return function (action) {
+      return typeof action === 'function' ? action(dispatch, getState) : next(action);
+    };
+  };
+}
+
+module.exports = thunkMiddleware;
+},{}],22:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6244,7 +6117,7 @@ function createStore(reducer, initialState) {
     replaceReducer: replaceReducer
   };
 }
-},{"./utils/isPlainObject":29}],24:[function(require,module,exports){
+},{"./utils/isPlainObject":28}],23:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6276,7 +6149,7 @@ exports.combineReducers = _utilsCombineReducers2['default'];
 exports.bindActionCreators = _utilsBindActionCreators2['default'];
 exports.applyMiddleware = _utilsApplyMiddleware2['default'];
 exports.compose = _utilsCompose2['default'];
-},{"./createStore":23,"./utils/applyMiddleware":25,"./utils/bindActionCreators":26,"./utils/combineReducers":27,"./utils/compose":28}],25:[function(require,module,exports){
+},{"./createStore":22,"./utils/applyMiddleware":24,"./utils/bindActionCreators":25,"./utils/combineReducers":26,"./utils/compose":27}],24:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6338,7 +6211,7 @@ function applyMiddleware() {
 }
 
 module.exports = exports['default'];
-},{"./compose":28}],26:[function(require,module,exports){
+},{"./compose":27}],25:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6394,7 +6267,7 @@ function bindActionCreators(actionCreators, dispatch) {
 }
 
 module.exports = exports['default'];
-},{"../utils/mapValues":30}],27:[function(require,module,exports){
+},{"../utils/mapValues":29}],26:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -6528,7 +6401,7 @@ function combineReducers(reducers) {
 
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"../createStore":23,"../utils/isPlainObject":29,"../utils/mapValues":30,"../utils/pick":31,"_process":7}],28:[function(require,module,exports){
+},{"../createStore":22,"../utils/isPlainObject":28,"../utils/mapValues":29,"../utils/pick":30,"_process":3}],27:[function(require,module,exports){
 /**
  * Composes single-argument functions from right to left.
  *
@@ -6554,7 +6427,7 @@ function compose() {
 }
 
 module.exports = exports["default"];
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -6585,7 +6458,7 @@ function isPlainObject(obj) {
 }
 
 module.exports = exports['default'];
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * Applies a function to every key-value pair inside an object.
  *
@@ -6606,7 +6479,7 @@ function mapValues(obj, fn) {
 }
 
 module.exports = exports["default"];
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /**
  * Picks key-value pairs from an object where values satisfy a predicate.
  *
@@ -6629,7 +6502,7 @@ function pick(obj, fn) {
 }
 
 module.exports = exports["default"];
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // This library started as an experiment to see how small I could make
 // a functional router. It has since been optimized (and thus grown).
 // The redundancy and inelegance here is for the sake of either size
@@ -6734,22 +6607,22 @@ module.exports = exports["default"];
   };
 }));
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var createElement = require("./vdom/create-element.js")
 
 module.exports = createElement
 
-},{"./vdom/create-element.js":45}],34:[function(require,module,exports){
+},{"./vdom/create-element.js":44}],33:[function(require,module,exports){
 var diff = require("./vtree/diff.js")
 
 module.exports = diff
 
-},{"./vtree/diff.js":65}],35:[function(require,module,exports){
+},{"./vtree/diff.js":64}],34:[function(require,module,exports){
 var h = require("./virtual-hyperscript/index.js")
 
 module.exports = h
 
-},{"./virtual-hyperscript/index.js":52}],36:[function(require,module,exports){
+},{"./virtual-hyperscript/index.js":51}],35:[function(require,module,exports){
 /*!
  * Cross-Browser Split 1.1.1
  * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
@@ -6857,22 +6730,22 @@ module.exports = (function split(undef) {
   return self;
 })();
 
-},{}],37:[function(require,module,exports){
-module.exports=require(12)
-},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/index.js":12,"individual/one-version":39}],38:[function(require,module,exports){
-module.exports=require(13)
-},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/node_modules/individual/index.js":13}],39:[function(require,module,exports){
-module.exports=require(14)
-},{"./index.js":38,"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/node_modules/individual/one-version.js":14}],40:[function(require,module,exports){
-module.exports=require(15)
-},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/global/document.js":15,"min-document":6}],41:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
+module.exports=require(8)
+},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/index.js":8,"individual/one-version":38}],37:[function(require,module,exports){
+module.exports=require(9)
+},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/node_modules/individual/index.js":9}],38:[function(require,module,exports){
+module.exports=require(10)
+},{"./index.js":37,"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/ev-store/node_modules/individual/one-version.js":10}],39:[function(require,module,exports){
+module.exports=require(11)
+},{"/Users/marknutter/Dropbox/OSS/nux/node_modules/dom-delegator/node_modules/global/document.js":11,"min-document":2}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function isObject(x) {
 	return typeof x === "object" && x !== null;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var nativeIsArray = Array.isArray
 var toString = Object.prototype.toString
 
@@ -6882,12 +6755,12 @@ function isArray(obj) {
     return toString.call(obj) === "[object Array]"
 }
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var patch = require("./vdom/patch.js")
 
 module.exports = patch
 
-},{"./vdom/patch.js":48}],44:[function(require,module,exports){
+},{"./vdom/patch.js":47}],43:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook.js")
 
@@ -6986,7 +6859,7 @@ function getPrototype(value) {
     }
 }
 
-},{"../vnode/is-vhook.js":56,"is-object":41}],45:[function(require,module,exports){
+},{"../vnode/is-vhook.js":55,"is-object":40}],44:[function(require,module,exports){
 var document = require("global/document")
 
 var applyProperties = require("./apply-properties")
@@ -7034,7 +6907,7 @@ function createElement(vnode, opts) {
     return node
 }
 
-},{"../vnode/handle-thunk.js":54,"../vnode/is-vnode.js":57,"../vnode/is-vtext.js":58,"../vnode/is-widget.js":59,"./apply-properties":44,"global/document":40}],46:[function(require,module,exports){
+},{"../vnode/handle-thunk.js":53,"../vnode/is-vnode.js":56,"../vnode/is-vtext.js":57,"../vnode/is-widget.js":58,"./apply-properties":43,"global/document":39}],45:[function(require,module,exports){
 // Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
 // We don't want to read all of the DOM nodes in the tree so we use
 // the in-order tree indexing to eliminate recursion down certain branches.
@@ -7121,7 +6994,7 @@ function ascending(a, b) {
     return a > b ? 1 : -1
 }
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var applyProperties = require("./apply-properties")
 
 var isWidget = require("../vnode/is-widget.js")
@@ -7274,7 +7147,7 @@ function replaceRoot(oldRoot, newRoot) {
     return newRoot;
 }
 
-},{"../vnode/is-widget.js":59,"../vnode/vpatch.js":62,"./apply-properties":44,"./update-widget":49}],48:[function(require,module,exports){
+},{"../vnode/is-widget.js":58,"../vnode/vpatch.js":61,"./apply-properties":43,"./update-widget":48}],47:[function(require,module,exports){
 var document = require("global/document")
 var isArray = require("x-is-array")
 
@@ -7356,7 +7229,7 @@ function patchIndices(patches) {
     return indices
 }
 
-},{"./create-element":45,"./dom-index":46,"./patch-op":47,"global/document":40,"x-is-array":42}],49:[function(require,module,exports){
+},{"./create-element":44,"./dom-index":45,"./patch-op":46,"global/document":39,"x-is-array":41}],48:[function(require,module,exports){
 var isWidget = require("../vnode/is-widget.js")
 
 module.exports = updateWidget
@@ -7373,7 +7246,7 @@ function updateWidget(a, b) {
     return false
 }
 
-},{"../vnode/is-widget.js":59}],50:[function(require,module,exports){
+},{"../vnode/is-widget.js":58}],49:[function(require,module,exports){
 'use strict';
 
 var EvStore = require('ev-store');
@@ -7402,7 +7275,7 @@ EvHook.prototype.unhook = function(node, propertyName) {
     es[propName] = undefined;
 };
 
-},{"ev-store":37}],51:[function(require,module,exports){
+},{"ev-store":36}],50:[function(require,module,exports){
 'use strict';
 
 module.exports = SoftSetHook;
@@ -7421,7 +7294,7 @@ SoftSetHook.prototype.hook = function (node, propertyName) {
     }
 };
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 var isArray = require('x-is-array');
@@ -7560,7 +7433,7 @@ function errorString(obj) {
     }
 }
 
-},{"../vnode/is-thunk":55,"../vnode/is-vhook":56,"../vnode/is-vnode":57,"../vnode/is-vtext":58,"../vnode/is-widget":59,"../vnode/vnode.js":61,"../vnode/vtext.js":63,"./hooks/ev-hook.js":50,"./hooks/soft-set-hook.js":51,"./parse-tag.js":53,"x-is-array":42}],53:[function(require,module,exports){
+},{"../vnode/is-thunk":54,"../vnode/is-vhook":55,"../vnode/is-vnode":56,"../vnode/is-vtext":57,"../vnode/is-widget":58,"../vnode/vnode.js":60,"../vnode/vtext.js":62,"./hooks/ev-hook.js":49,"./hooks/soft-set-hook.js":50,"./parse-tag.js":52,"x-is-array":41}],52:[function(require,module,exports){
 'use strict';
 
 var split = require('browser-split');
@@ -7616,7 +7489,7 @@ function parseTag(tag, props) {
     return props.namespace ? tagName : tagName.toUpperCase();
 }
 
-},{"browser-split":36}],54:[function(require,module,exports){
+},{"browser-split":35}],53:[function(require,module,exports){
 var isVNode = require("./is-vnode")
 var isVText = require("./is-vtext")
 var isWidget = require("./is-widget")
@@ -7658,14 +7531,14 @@ function renderThunk(thunk, previous) {
     return renderedThunk
 }
 
-},{"./is-thunk":55,"./is-vnode":57,"./is-vtext":58,"./is-widget":59}],55:[function(require,module,exports){
+},{"./is-thunk":54,"./is-vnode":56,"./is-vtext":57,"./is-widget":58}],54:[function(require,module,exports){
 module.exports = isThunk
 
 function isThunk(t) {
     return t && t.type === "Thunk"
 }
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = isHook
 
 function isHook(hook) {
@@ -7674,7 +7547,7 @@ function isHook(hook) {
        typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
 }
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualNode
@@ -7683,7 +7556,7 @@ function isVirtualNode(x) {
     return x && x.type === "VirtualNode" && x.version === version
 }
 
-},{"./version":60}],58:[function(require,module,exports){
+},{"./version":59}],57:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualText
@@ -7692,17 +7565,17 @@ function isVirtualText(x) {
     return x && x.type === "VirtualText" && x.version === version
 }
 
-},{"./version":60}],59:[function(require,module,exports){
+},{"./version":59}],58:[function(require,module,exports){
 module.exports = isWidget
 
 function isWidget(w) {
     return w && w.type === "Widget"
 }
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports = "2"
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 var version = require("./version")
 var isVNode = require("./is-vnode")
 var isWidget = require("./is-widget")
@@ -7776,7 +7649,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
 VirtualNode.prototype.version = version
 VirtualNode.prototype.type = "VirtualNode"
 
-},{"./is-thunk":55,"./is-vhook":56,"./is-vnode":57,"./is-widget":59,"./version":60}],62:[function(require,module,exports){
+},{"./is-thunk":54,"./is-vhook":55,"./is-vnode":56,"./is-widget":58,"./version":59}],61:[function(require,module,exports){
 var version = require("./version")
 
 VirtualPatch.NONE = 0
@@ -7800,7 +7673,7 @@ function VirtualPatch(type, vNode, patch) {
 VirtualPatch.prototype.version = version
 VirtualPatch.prototype.type = "VirtualPatch"
 
-},{"./version":60}],63:[function(require,module,exports){
+},{"./version":59}],62:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = VirtualText
@@ -7812,7 +7685,7 @@ function VirtualText(text) {
 VirtualText.prototype.version = version
 VirtualText.prototype.type = "VirtualText"
 
-},{"./version":60}],64:[function(require,module,exports){
+},{"./version":59}],63:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook")
 
@@ -7872,7 +7745,7 @@ function getPrototype(value) {
   }
 }
 
-},{"../vnode/is-vhook":56,"is-object":41}],65:[function(require,module,exports){
+},{"../vnode/is-vhook":55,"is-object":40}],64:[function(require,module,exports){
 var isArray = require("x-is-array")
 
 var VPatch = require("../vnode/vpatch")
@@ -8301,4 +8174,520 @@ function appendPatch(apply, patch) {
     }
 }
 
-},{"../vnode/handle-thunk":54,"../vnode/is-thunk":55,"../vnode/is-vnode":57,"../vnode/is-vtext":58,"../vnode/is-widget":59,"../vnode/vpatch":62,"./diff-props":64,"x-is-array":42}]},{},[1]);
+},{"../vnode/handle-thunk":53,"../vnode/is-thunk":54,"../vnode/is-vnode":56,"../vnode/is-vtext":57,"../vnode/is-widget":58,"../vnode/vpatch":61,"./diff-props":63,"x-is-array":41}],65:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+/** @module index */
+
+/* Type Definititions */
+
+/**
+ * A Redux store.
+ * @typedef {Object} Store
+ * @property {Function} dispatch Dispatch a provided action with type to invoke a matching reducer.
+ * @property {Function} getState Get the current global state.
+ * @property {Function} subscribe Provide callback to be invoked every time an action is fired.
+ * @property {Function} replaceReducer Replace an existing reducer with a new one.
+ */
+
+var h = _interopRequire(require("virtual-dom/h"));
+
+var diff = _interopRequire(require("virtual-dom/diff"));
+
+var patch = _interopRequire(require("virtual-dom/patch"));
+
+var createElement = _interopRequire(require("virtual-dom/create-element"));
+
+var delegator = _interopRequire(require("dom-delegator"));
+
+var thunkMiddleware = _interopRequire(require("redux-thunk"));
+
+var createLogger = _interopRequire(require("redux-logger"));
+
+var _redux = require("redux");
+
+var createStore = _redux.createStore;
+var compose = _redux.compose;
+var applyMiddleware = _redux.applyMiddleware;
+
+var utils = _interopRequire(require("./utils"));
+
+var renderUI = require("./ui").renderUI;
+
+var reducer = require("./reducer").reducer;
+
+var _immutable = require("immutable");
+
+var fromJS = _immutable.fromJS;
+var Map = _immutable.Map;
+var Iterable = _immutable.Iterable;
+
+var Rlite = _interopRequire(require("rlite-router"));
+
+var reduceReducers = _interopRequire(require("reduce-reducers"));
+
+var nux = window.nux = module.exports = {
+  init: init,
+  options: {
+    localStorage: false,
+    logActions: false
+  },
+  utils: utils
+};
+
+/**
+ * Used to initialize a new Nux application. Any reducer that is provided will be combined with Nux's built
+ * in reducers. The initial UI is the base template for the application and is what will be rendered immediately
+ * upon initialization. A number of options can be provided as documented, and any element can be specified into
+ * which Nux will render the application, allowing for the running of multiple, disparate instances of Nux on
+ * a given page. A Redux store is returned, although direct interaction with the store should be unnecessary.
+ * Once initialized, any changes to the global state for a given Nux instance will be immediately reflected in
+ * via an efficient patching mechanism via virtual-dom.
+ *
+ * @author Mark Nutter <marknutter@gmail.com>
+ * @summary Initialize a Nux application.
+ *
+ * @param {Function} appReducer The provided reducer function.
+ * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
+ * @param {Object} [options] Options to configure the nux application.
+ * @param {Boolean} [options.localStorage=false] Enable caching of global state to localStorage.
+ * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
+ * @param {Element} [elem=HTMLBodyElement] The element into which the nux application will be rendered.
+ * @return {Store} Redux store where app state is maintained.
+ */
+function init(appReducer) {
+  var _this = this;
+
+  var actionCreators = arguments[1] === undefined ? {} : arguments[1];
+  var options = arguments[2] === undefined ? nux.options : arguments[2];
+  var elem = arguments[3] === undefined ? document.body : arguments[3];
+
+  return function () {
+    var initialUI = arguments[0] === undefined ? { div: {} } : arguments[0];
+
+    var initialState = initialUI;
+    if (options.localStorage && localStorage.getItem("nux")) {
+      initialState = JSON.parse(localStorage.getItem("nux"));
+    };
+
+    delegator();
+
+    var router = Rlite();
+    var middleWare = [thunkMiddleware];
+    if (options.logActions) {
+      middleWare.push(createLogger({
+        stateTransformer: function (state) {
+          return state.toJS();
+        }
+      }));
+    }
+
+    var finalAppReducer = typeof appReducer === "function" ? appReducer : combineReducers(appReducer);
+
+    var finalReducer = reduceReducers(reducer(initialState, options), finalAppReducer);
+
+    var createStoreWithMiddleware = applyMiddleware.apply(_this, middleWare)(createStore);
+    var store = createStoreWithMiddleware(finalReducer);
+    var currentUI = store.getState().get("ui").toVNode(store);
+    var rootNode = createElement(currentUI);
+    elem.appendChild(rootNode);
+
+    store.getActionCreator = function (actionName) {
+      if (actionCreators[actionName] === undefined) {
+        throw new Error("AtionCreatorNotFoundError: no action creator has been specified for the key " + actionName);
+      }
+      return actionCreators[actionName];
+    };
+
+    if (store.getState().get("routes")) {
+      var processHash = function () {
+        var hash = location.hash || "#";
+        router.run(hash.slice(1));
+      };
+
+      store.getState().get("routes").forEach(function (action, route) {
+        router.add(route, function (r) {
+          store.dispatch(action.merge(Map(r)).toJS());
+        });
+      });
+
+      window.addEventListener("hashchange", processHash);
+      processHash();
+    }
+
+    store.subscribe(function () {
+      var ui = store.getState().get("ui");
+      if (options.localStorage) {
+        localStorage.setItem("nux", JSON.stringify(ui ? ui.toJS() : {}));
+      }
+      var newUI = store.getState().get("ui").toVNode(store);
+      var patches = diff(currentUI, newUI);
+      rootNode = patch(rootNode, patches);
+      currentUI = newUI;
+    });
+
+    return store;
+  };
+}
+
+},{"./reducer":66,"./ui":67,"./utils":68,"dom-delegator":6,"immutable":18,"reduce-reducers":19,"redux":23,"redux-logger":20,"redux-thunk":21,"rlite-router":31,"virtual-dom/create-element":32,"virtual-dom/diff":33,"virtual-dom/h":34,"virtual-dom/patch":42}],66:[function(require,module,exports){
+
+
+/**
+ * Create a reducer using a provided reducer combined with Nux's internal reducer. An initial vDOM UI object
+ * can be passed in to initialize the store with, as well as any options to further configure the reducer.
+ * The reducer returned is intended for use with a Redux store.
+ *
+ * @author Mark Nutter <marknutter@gmail.com>
+ * @summary Generate a Nux reducer function given a custom reducer function.
+ *
+ * @param {Function} appReducer The provided reducer function.
+ * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
+ * @param {Object} [options] Options to configure the generated reducer.
+ * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
+ * @return {Function} Reducer function to be used to initialize a Redux store
+ */
+"use strict";
+
+exports.reducer = reducer;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/** @module reducer */
+
+/**
+ * An Immutable Map.
+ * @typedef {Object} Map
+ */
+
+var _immutable = require("immutable");
+
+var fromJS = _immutable.fromJS;
+var Iterable = _immutable.Iterable;
+var Map = _immutable.Map;
+
+function reducer() {
+  var initialUI = arguments[0] === undefined ? {} : arguments[0];
+  var options = arguments[1] === undefined ? {} : arguments[1];
+
+  var initialState = fromJS({ ui: initialUI }, function (key, value) {
+    var isIndexed = Iterable.isIndexed(value);
+    return isIndexed ? value.toList() : value.toOrderedMap();
+  }).merge(options.routes ? fromJS({ routes: options.routes }) : {});
+
+  return function (_x3, action) {
+    var state = arguments[0] === undefined ? initialState : arguments[0];
+
+    var nextState = undefined;
+    switch (action.type) {
+      case "_UPDATE_INPUT_VALUE":
+        nextState = state.setIn(action.pathArray.concat(["props", "value"]), action.val);
+        break;
+      default:
+        nextState = state;
+        break;
+    }
+    return nextState;
+  };
+}
+
+},{"immutable":18}],67:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+/**
+ * Accepts a Nux vDOM object and returns a VirtualNode. The vDOM object's 'children' are recursively converted
+ * to VirtualNodes. The 'props' for any given are modified such that any custom events are assigned callbacks
+ * which dispatch the associated actions. The Nux default event handlers are also added to the 'props' object
+ * for a given node. This is where all the magic happens, folks.
+ *
+ * @author Mark Nutter <marknutter@gmail.com>
+ *
+ * @param {Store} store A redux store
+ * @param {Object} ui The Nux vDOM object to be recursively converted into a VirtualNode
+ * @param {Array} [pathArray] The location of the provided vDOM object within another vDOM object (if applicable)
+ * @return {Store} Redux store where app state is maintained.
+ */
+exports.renderUI = renderUI;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/** @module ui */
+
+var h = _interopRequire(require("virtual-dom/h"));
+
+var _immutable = require("immutable");
+
+var fromJS = _immutable.fromJS;
+var Map = _immutable.Map;
+var List = _immutable.List;
+var Iterable = _immutable.Iterable;
+
+function renderUI(store, ui) {
+  var pathArray = arguments[2] === undefined ? List() : arguments[2];
+
+  // ui objects come as a key/value pair so extract the key as the tag name and value as the node data
+
+  var tagName = ui.findKey(function () {
+    return true;
+  });
+  var node = ui.get(tagName);
+
+  // keep track of our current location in the ui vDOM object
+  var currentPathArray = pathArray.size === 0 ? pathArray.push(tagName) : pathArray;
+  var children = List(),
+      props = node.get("props") || Map();
+
+  var childNodes = node.filterNot(function (val, key) {
+    return key === "props";
+  });
+
+  // recurse through this node's children and render their UI as hyperscript
+  if (childNodes) {
+    children = childNodes.map(function (childVal, childTagName) {
+      if (childTagName === "$text") {
+        return new List([childVal]);
+      } else {
+        return renderUI(store, new Map().set(childTagName, childVal), currentPathArray.concat([childTagName]));
+      }
+    }).toList();
+  }
+
+  // add an event handler to inputs that updates their 'val' prop node when changes are detected
+  var registeredKeyEvents = {};
+  if (tagName.indexOf("input") > -1) {
+    props = props.set("ev-keyup", function (e) {
+      e.preventDefault();
+      store.dispatch({
+        type: "_UPDATE_INPUT_VALUE",
+        val: e.target.value,
+        pathArray: ["ui"].concat(currentPathArray.toJS())
+      });
+      registeredKeyEvents["ev-keyup"] ? registeredKeyEvents["ev-keyup"](e) : false;
+      registeredKeyEvents["ev-keyup-" + e.keyCode] ? registeredKeyEvents["ev-keyup-" + e.keyCode](e) : false;
+    });
+  }
+
+  // for any custom events detected, add callbacks that dispatch provided actions
+  if (props.get("events")) {
+    props = props.get("events").reduce(function (oldProps, val, key) {
+      if (key.indexOf("ev-keyup") > -1) {
+        registeredKeyEvents[key] = function (e) {
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
+        };
+        return oldProps;
+      } else {
+        return oldProps.set(key, function (e) {
+          e.preventDefault();
+          fireDispatch(store, val, e);
+          createAction(store, val, e);
+        });
+      }
+    }, props)["delete"]("events");
+  }
+
+  // combine tag, props, and children into an array of plain javascript objects and return hyperscript VirtualNode
+  return h.apply(this, [tagName, props.toJS(), children.toJS()]);
+}
+
+;
+
+function fireDispatch(store, val, event) {
+  if (val.get("dispatch")) {
+    store.dispatch(val.get("dispatch").merge(Map({ event: event })).toJS());
+  }
+}
+
+function createAction(store, val, event) {
+  if (val.get("action")) {
+    // if the action is an object, pass that object along as the argument to the action creator
+    if (typeof val.getIn(["action", "type"]) === "string") {
+      var actionCreator = store.getActionCreator(val.getIn(["action", "type"]));
+      var action = val.get("action").merge(Map({ event: event })).toJS();
+      store.dispatch(actionCreator(action));
+    }
+    // if the action is just the action name, then fire it without any arguments
+    else if (typeof val.get("action") === "string") {
+      var actionCreator = store.getActionCreator(val.get("action"));
+      var action = Map({ type: val.get("action"), event: event }).toJS();
+      store.dispatch(actionCreator(action));
+    }
+  }
+}
+
+},{"immutable":18,"virtual-dom/h":34}],68:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+/**
+ * Returns an array path that can be used to deeply select inside of Nux. 'children' strings
+ * will be interleaved between tag strings while all nodes from 'props' and onward will be
+ * added in sequence. All returned arrays will include a leading 'ui' node.
+ *
+ * @example
+ * selector('div#foo form#bar input#baz props value');
+ * // returns ['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props', 'value']
+ *
+ * @author Mark Nutter <marknutter@gmail.com>
+ * @summary Generate a Nux reducer function given a custom reducer function.
+ *
+ * @param {String} selectorString
+ * @return {Array} Path array used to deeply select inside of Immutable Nux vDOM objects
+ */
+exports.selector = selector;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/** @module utils */
+
+var _immutable = require("immutable");
+
+var Collection = _immutable.Collection;
+var Map = _immutable.Map;
+var fromJS = _immutable.fromJS;
+
+var renderUI = require("./ui").renderUI;
+
+var createElement = _interopRequire(require("virtual-dom/create-element"));
+
+Collection.prototype.$ = function $(query, setVal) {
+  var pathArray = selector(query);
+  var tagName = pathArray.pop();
+  var nodeVal = undefined,
+      node = undefined;
+
+  if (setVal !== undefined) {
+    return this.setIn(selector(query), setVal);
+  } else {
+    nodeVal = this.getIn(selector(query));
+    node = new Map().set(tagName, nodeVal);
+    node.__queryNode = this;
+    node.__query = query;
+    return node;
+  }
+};
+
+Collection.prototype.children = function () {
+  var tagName = this.findKey(function () {
+    return true;
+  });
+  var node = this.set(tagName, this.get(tagName) || new Map());
+
+  var children = this.get(tagName) && this.get(tagName).filterNot(function (val, key) {
+    return key === "props";
+  }) || new Map();
+  var props = this.getIn([tagName, "props"]) || new Map();
+  if (arguments.length === 0) {
+    return children;
+  }
+  if (arguments[0] && typeof arguments[0] === "object") {
+    children = fromJS(arguments[0]);
+  } else if (typeof arguments[0] === "string" && arguments[1] !== undefined) {
+    children = arguments[1] === null ? children["delete"](arguments[0]) : children.set(arguments[0], arguments[1]);
+  } else if (arguments.length === 1 && typeof arguments[0] === "string") {
+    return children.get(arguments[0]);
+  }
+  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query), children.set("props", props)) : this.set(tagName, children.set("props", props));
+};
+
+Collection.prototype.toNode = function toNode(tagName) {
+  return new Map().set(tagName, this);
+};
+
+Collection.prototype.toVNode = function toVNode(store) {
+  return renderUI(store, this);
+};
+
+Collection.prototype.toElement = function toElement(store) {
+  var vNode = this.toVNode(store);
+  if (vNode) {
+    return createElement(vNode);
+  }
+};
+
+Collection.prototype.toHTML = function toHTML(store) {
+  var element = this.toElement(store);
+  if (element) {
+    return element.outerHTML;
+  }
+};
+
+Collection.prototype.props = function () {
+  var tagName = this.findKey(function () {
+    return true;
+  });
+  var props = this.getIn([tagName, "props"]) || new Map();
+  if (arguments.length === 0) {
+    return props;
+  }
+  if (typeof arguments[0] === "object") {
+    props = props.merge(arguments[0]);
+  } else if (typeof arguments[0] === "string" && arguments[1] !== undefined) {
+    props = arguments[1] === null ? props["delete"](arguments[0]) : props.set(arguments[0], fromJS(arguments[1]));
+  } else if (arguments.length === 1 && typeof arguments[0] === "string") {
+    return props.get(arguments[0]);
+  }
+  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query).concat("props"), props) : this.setIn([tagName, "props"], props);
+};
+
+Collection.prototype.style = function () {
+  var tagName = this.findKey(function () {
+    return true;
+  });
+  var style = this.getIn([tagName, "props", "style"]) || new Map();
+  if (!style) {
+    return new Map();
+  }
+  if (arguments.length === 0) {
+    return style;
+  }
+
+  if (typeof arguments[0] === "object") {
+    style = style.merge(arguments[0]);
+  } else if (typeof arguments[0] === "string" && typeof arguments[1] === "string") {
+    style = style.set(arguments[0], arguments[1]);
+  } else if (typeof arguments[0] === "string" && arguments[1] === null) {
+    style = style["delete"](arguments[0]);
+  } else if (arguments.length === 1 && typeof arguments[0] === "string") {
+
+    return style.get(arguments[0]);
+  }
+  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query).concat(["props", "style"]), style) : this.setIn([tagName, "props", "style"], style);
+};
+
+Collection.prototype.events = function () {
+  var tagName = this.findKey(function () {
+    return true;
+  });
+  var events = this.getIn([tagName, "props", "events"]) || new Map();
+  if (!events) {
+    return new Map();
+  }
+  if (arguments.length === 0) {
+    return events;
+  }
+
+  if (typeof arguments[0] === "object") {
+    events = events.merge(arguments[0]);
+  } else if (typeof arguments[0] === "string" && typeof arguments[1] === "object") {
+    events = events.set(arguments[0], fromJS(arguments[1]));
+  } else if (typeof arguments[0] === "string" && arguments[1] === null) {
+    events = events["delete"](arguments[0]);
+  } else if (arguments.length === 1 && typeof arguments[0] === "string") {
+    return events.get(arguments[0]);
+  }
+
+  return this.__queryNode ? this.__queryNode.setIn(selector(this.__query).concat(["props", "events"]), events) : this.setIn([tagName, "props", "events"], events);
+};
+function selector(selectorString) {
+  return selectorString.split(" ");
+}
+
+;
+
+},{"./ui":67,"immutable":18,"virtual-dom/create-element":32}]},{},[1]);

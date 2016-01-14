@@ -23,6 +23,9 @@ var config = {
   todoMVCOutputDir: './example/todo-mvc/dist/',
   todoMVCDir: './example/todo-mvc/',
   todoMVCOutputFile: 'todo-mvc.js',
+  helloWorldOutputFile: 'hello-world.js',
+  helloWorldOutputDir: './assets/scripts/',
+  helloWorldEntryFile: './hello-world.js',
   nuxMinifiedOutputFile: 'nux.js',
   nuxMinifiedOutputDir: './',
   nuxMinifiedEntryFile: './lib/index.js',
@@ -65,12 +68,19 @@ gulp.task('build-nux-minified', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('build-nux', function() {
-  return gulp.src('src/**/*.js')
-    .pipe(babel({
-      presets: ['es2015']
-    }))
-    .pipe(gulp.dest('lib'));
+
+gulp.task('build-hello-world', function() {
+  browserify(config.helloWorldEntryFile)
+  .transform(babelify)
+  .bundle()
+  .on('error', function(err) { console.log('Error: ' + err.message); })
+  .pipe(source(config.helloWorldOutputFile))
+  .pipe(gulp.dest(config.helloWorldOutputDir))
+  .pipe(streamify(uglify()))
+  .pipe(rename({
+    extname: '.min.js'
+  }))
+  .pipe(gulp.dest('./assets/scripts/'));
 });
 
 gulp.task('watch-simple-todo', function(cb) {
@@ -97,6 +107,7 @@ gulp.task('build-simple-todo', ['clean-simple-todo'], function() {
 gulp.task('clean-simple-todo', function(cb){
     rimraf(config.simpleTodoOutputDir, cb);
 });
+
 
 gulp.task('watch-todo-mvc', ['build-todo-mvc'], function(cb) {
   browserSync({
