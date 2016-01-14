@@ -13,18 +13,17 @@ Nux combines [redux](http://redux.js.org), [virtual-dom](https://github.com/Matt
 ###Example
 
 ```js
-import init from 'nux';
+import {init} from './src/index';
 
 let helloWorld = init(
-
 
 // first argument is your reducer - the only concern that modifies your app's state
 (state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
-    const inputVal = state.$('div#hw input').props('value');
-    return state.$('div#hw h5 $text'), inputVal)
-                .$('div#hw input').props('value', '');
+    const inputVal = state.$('ui div#hw input').props('value');
+    return state.$('ui div#hw h5 $text', inputVal)
+                .$('ui div#hw input').props('value', '');
   }
   return state;
 },
