@@ -54,7 +54,7 @@ var nux = window.nux = module.exports = {
  * @param  {Function} appReducer The provided reducer function.
  * @param  {Object}   [options]                             Options to configure the nux application.
  * @param  {Object}   [options.initialUI={ui:{div:{}}}]     The initial UI vDOM object which will become the first state to be rendered.
- * @param  {Boolean}  [options.localStorage=false]          Enable caching of global state to localStorage.
+ * @param  {String}  [options.localStorage=false]           Enable caching of global state to localStorage under the provided key
  * @param  {Boolean}  [options.logActions=false]            Enable advanced logging of all actions fired.
  * @param  {Element}  [options.targetElem=HTMLBodyElement]  The element into which the nux application will be rendered.
  * @param  {Object}   [options.actionCreators={}]           Custom action creators with thunks enabled
@@ -65,7 +65,7 @@ function init(appReducer, options = nux.options) {
   return (initialUI = {ui: { div: {}}}) => {
 
     let initialState = initialUI;
-    if (options.localStorage && localStorage.getItem('nux')) {
+    if (options.localStorage && typeof options.localStorage === 'string' && localStorage.getItem(options.localStorage)) {
       initialState = JSON.parse(localStorage.getItem('nux'));
     };
 
@@ -116,11 +116,11 @@ function init(appReducer, options = nux.options) {
       processHash();
     }
 
+    storeToLocalStorage(options.localStorage, store);
+
     store.subscribe(() => {
       const ui = store.getState().get('ui');
-      if (options.localStorage) {
-        localStorage.setItem('nux', JSON.stringify(store.getState().toJS()));
-      }
+      storeToLocalStorage(options.localStorage, store);
       var newUI = store.getState().get('ui').toVNode(store);
       var patches = diff(currentUI, newUI);
       rootNode = patch(rootNode, patches);
@@ -132,5 +132,9 @@ function init(appReducer, options = nux.options) {
   }
 }
 
-
+function storeToLocalStorage(key, store) {
+  if (key && typeof key === 'string') {
+    localStorage.setItem(key, JSON.stringify(store.getState().toJS()));
+  }
+}
 

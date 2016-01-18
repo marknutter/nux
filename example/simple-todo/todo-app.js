@@ -10,6 +10,6 @@ let todoApp = init((state, action) => {
       return toggleTodo(state, action.tag);
   }
   return state;
-}, {logActions: true});
+}, {logActions: true, localStorage: 'nuxSimpleTodo'});
 
 todoApp(todoUi);

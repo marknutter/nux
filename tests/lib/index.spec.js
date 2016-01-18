@@ -37,7 +37,7 @@ describe('the Nux init function', () => {
   it('should allow enabling of caching app state to localStorage', () => {
     localStorage.setItem = jasmine.createSpy('setItem');
     localStorage.getItem = jasmine.createSpy('getItem');
-    var testApp = init(testReducer, {localStorage: true})();
+    var testApp = init(testReducer, {localStorage: 'nux'})();
     testApp.dispatch({type: 'FOO'});
     expect(localStorage.setItem).toHaveBeenCalledWith('nux', JSON.stringify({ui: {div:{}}}));
     expect(localStorage.getItem).toHaveBeenCalledWith('nux');

@@ -25,7 +25,7 @@ let todoMvc = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, {logActions: true, localStorage: true});
+}, {logActions: true, localStorage: 'nuxTodoMVC'});
 
 todoMvc(todoMvcUi);
 
