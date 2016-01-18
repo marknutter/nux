@@ -15,24 +15,8 @@ describe('the Nux utility ', () => {
 
   describe('selector()', () => {
 
-    it("should turn a selector string into a path array with 'children' strings separating any tags", () => {
-      expect(selector('div#foo form#bar input#baz'))
-        .toEqual(['div#foo', 'form#bar', 'input#baz']);
-    });
-
-    it("should return a trailing 'children' string if provided", () => {
-      expect(selector('div#foo form#bar input#baz children'))
-        .toEqual(['div#foo', 'form#bar', 'input#baz', 'children']);
-    });
-
-    it("should return props without interweaving 'children' strings", () => {
-      expect(selector('div#foo form#bar input#baz props value'))
-        .toEqual(['div#foo', 'form#bar', 'input#baz', 'props', 'value']);
-    });
-
-    it("should return trailing 'props' string correctly", () => {
-      expect(selector('div#foo form#bar input#baz props'))
-        .toEqual(['div#foo', 'form#bar', 'input#baz', 'props']);
+    it("should turn a selector string into a path array", () => {
+      expect(selector('div#foo form#bar input#baz')).toEqual(['div#foo', 'form#bar', 'input#baz']);
     });
 
   });

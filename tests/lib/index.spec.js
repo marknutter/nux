@@ -4,16 +4,18 @@ import {fromJS} from 'immutable';
 describe('the Nux init function', () => {
   let testReducer = (state, action) => { return state};
   const testUI = {
-    'div#app': {
-      props: {
-        style: {
-          fontFamily: 'helvetica'
-        }
-      },
-      'h1': {
+    ui: {
+      'div#app': {
         props: {
           style: {
-            fontSize: '20px'
+            fontFamily: 'helvetica'
+          }
+        },
+        'h1': {
+          props: {
+            style: {
+              fontSize: '20px'
+            }
           }
         }
       }
@@ -23,12 +25,12 @@ describe('the Nux init function', () => {
 
   it('should initialize with a blank UI if none is provided', () => {
     var testApp = init(testReducer)()
-    expect(testApp.getState().toJS()).toEqual({ui: { div: {}}});
+    expect(testApp.getState().toJS()).toEqual({ui: { div: {} }});
   });
 
   it('should initialize with the UI provided', () => {
     var testApp = init(testReducer)(testUI);
-    expect(testApp.getState().toJS()).toEqual({ui: testUI});
+    expect(testApp.getState().toJS()).toEqual(testUI);
     expect(document.querySelector('div#app').outerHTML).toEqual('<div style="font-family: helvetica; " id="app"><h1 style="font-size: 20px; "></h1></div>');
   });
 
@@ -37,7 +39,7 @@ describe('the Nux init function', () => {
     localStorage.getItem = jasmine.createSpy('getItem');
     var testApp = init(testReducer, {localStorage: true})();
     testApp.dispatch({type: 'FOO'});
-    expect(localStorage.setItem).toHaveBeenCalledWith('nux', JSON.stringify({div:{}}));
+    expect(localStorage.setItem).toHaveBeenCalledWith('nux', JSON.stringify({ui: {div:{}}}));
     expect(localStorage.getItem).toHaveBeenCalledWith('nux');
   });
 

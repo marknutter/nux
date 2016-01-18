@@ -52,17 +52,17 @@ var nux = window.nux = module.exports = {
  * @summary Initialize a Nux application.
  *
  * @param  {Function} appReducer The provided reducer function.
- * @param  {Object}   [options]                            Options to configure the nux application.
- * @param  {Object}   [options.initialUI={ui: {}}]         The initial UI vDOM object which will become the first state to be rendered.
- * @param  {Boolean}  [options.localStorage=false]         Enable caching of global state to localStorage.
- * @param  {Boolean}  [options.logActions=false]           Enable advanced logging of all actions fired.
- * @param  {Element}  [options.targetElem=HTMLBodyElement] The element into which the nux application will be rendered.
- * @param  {Object}   [options.actionCreators={}]          Custom action creators with thunks enabled
+ * @param  {Object}   [options]                             Options to configure the nux application.
+ * @param  {Object}   [options.initialUI={ui:{div:{}}}]     The initial UI vDOM object which will become the first state to be rendered.
+ * @param  {Boolean}  [options.localStorage=false]          Enable caching of global state to localStorage.
+ * @param  {Boolean}  [options.logActions=false]            Enable advanced logging of all actions fired.
+ * @param  {Element}  [options.targetElem=HTMLBodyElement]  The element into which the nux application will be rendered.
+ * @param  {Object}   [options.actionCreators={}]           Custom action creators with thunks enabled
  * @return {Store}    Redux store where app state is maintained.
  */
 function init(appReducer, options = nux.options) {
 
-  return (initialUI = {ui: {}}) => {
+  return (initialUI = {ui: { div: {}}}) => {
 
     let initialState = initialUI;
     if (options.localStorage && localStorage.getItem('nux')) {
@@ -119,7 +119,7 @@ function init(appReducer, options = nux.options) {
     store.subscribe(() => {
       const ui = store.getState().get('ui');
       if (options.localStorage) {
-        localStorage.setItem('nux', JSON.stringify(ui ? ui.toJS() : {}));
+        localStorage.setItem('nux', JSON.stringify(store.getState().toJS()));
       }
       var newUI = store.getState().get('ui').toVNode(store);
       var patches = diff(currentUI, newUI);
