@@ -66,7 +66,7 @@ function init(appReducer, options = nux.options) {
 
     let initialState = initialUI;
     if (options.localStorage && typeof options.localStorage === 'string' && localStorage.getItem(options.localStorage)) {
-      initialState = JSON.parse(localStorage.getItem('nux'));
+      initialState = JSON.parse(localStorage.getItem(options.localStorage));
     };
 
     options.targetElem = options.targetElem || document.body;
