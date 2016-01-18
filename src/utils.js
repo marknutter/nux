@@ -125,18 +125,13 @@ Collection.prototype.events = function() {
 }
 
 /**
- * Returns an array path that can be used to deeply select inside of Nux. 'children' strings
- * will be interleaved between tag strings while all nodes from 'props' and onward will be
- * added in sequence. All returned arrays will include a leading 'ui' node.
+ * Returns an array path from a string selector
  *
  * @example
- * selector('div#foo form#bar input#baz props value');
- * // returns ['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props', 'value']
+ * selector('div#foo form#bar input#baz');
+ * // returns ['div#foo', 'form#bar', 'input#baz']
  *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Generate a Nux reducer function given a custom reducer function.
- *
- * @param {String} selectorString
+ * @param {String} selectorString A space separated series of tag names
  * @return {Array} Path array used to deeply select inside of Immutable Nux vDOM objects
  */
 export function selector(selectorString) {

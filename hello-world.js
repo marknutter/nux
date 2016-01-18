@@ -18,16 +18,18 @@ let helloWorld = init((state, action) => {
 // pass an initial UI object to the app to start it up
 
 helloWorld({
-  'div#hw': {
-    'h5': {
-    },
-    'input': {
-      props: {
-        placeholder: 'type and hit enter..',
-        events: {
-          'ev-keyup-13': {
-            dispatch: {
-              type: 'SUBMIT_STATEMENT'
+  ui: {
+    'div#hw': {
+      'h5': {
+      },
+      'input': {
+        props: {
+          placeholder: 'type and hit enter..',
+          events: {
+            'ev-keyup-13': {
+              dispatch: {
+                type: 'SUBMIT_STATEMENT'
+              }
             }
           }
         }

@@ -2,20 +2,6 @@ import {addTodo, toggleTodo, toggleAllTodos, showTodos, clearCompletedTodos, del
 import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
-let routes = {
-  'all': {
-    type: 'SHOW_TODOS',
-    view: 'all'
-  },
-  'completed': {
-    type: 'SHOW_TODOS',
-    view: 'completed'
-  },
-  'active': {
-    type: 'SHOW_TODOS',
-    view: 'active'
-  }
-}
 
 let todoMvc = init((state, action) => {
   switch (action.type) {
@@ -39,7 +25,7 @@ let todoMvc = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, {logActions: true, routes: routes});
+}, {logActions: true, localStorage: true});
 
 todoMvc(todoMvcUi);
 

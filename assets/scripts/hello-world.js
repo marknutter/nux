@@ -19,15 +19,17 @@ var helloWorld = init(function (state, action) {
 // pass an initial UI object to the app to start it up
 
 helloWorld({
-  "div#hw": {
-    h5: {},
-    input: {
-      props: {
-        placeholder: "type and hit enter..",
-        events: {
-          "ev-keyup-13": {
-            dispatch: {
-              type: "SUBMIT_STATEMENT"
+  ui: {
+    "div#hw": {
+      h5: {},
+      input: {
+        props: {
+          placeholder: "type and hit enter..",
+          events: {
+            "ev-keyup-13": {
+              dispatch: {
+                type: "SUBMIT_STATEMENT"
+              }
             }
           }
         }
@@ -8264,7 +8266,7 @@ var nux = window.nux = module.exports = {
  *
  * @param  {Function} appReducer The provided reducer function.
  * @param  {Object}   [options]                            Options to configure the nux application.
- * @param  {Object}   [options.initialUI={div: {}}]        The initial UI vDOM object which will become the first state to be rendered.
+ * @param  {Object}   [options.initialUI={ui: {}}]         The initial UI vDOM object which will become the first state to be rendered.
  * @param  {Boolean}  [options.localStorage=false]         Enable caching of global state to localStorage.
  * @param  {Boolean}  [options.logActions=false]           Enable advanced logging of all actions fired.
  * @param  {Element}  [options.targetElem=HTMLBodyElement] The element into which the nux application will be rendered.
@@ -8277,7 +8279,7 @@ function init(appReducer) {
   var options = arguments[1] === undefined ? nux.options : arguments[1];
 
   return function () {
-    var initialUI = arguments[0] === undefined ? { div: {} } : arguments[0];
+    var initialUI = arguments[0] === undefined ? { ui: {} } : arguments[0];
 
     var initialState = initialUI;
     if (options.localStorage && localStorage.getItem("nux")) {
@@ -8357,11 +8359,8 @@ function init(appReducer) {
  * @author Mark Nutter <marknutter@gmail.com>
  * @summary Generate a Nux reducer function given a custom reducer function.
  *
- * @param {Function} appReducer The provided reducer function.
- * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
- * @param {Object} [options] Options to configure the generated reducer.
- * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
- * @return {Function} Reducer function to be used to initialize a Redux store
+ * @param {Object}    [initialUI] The initial UI vDOM object which will become the first state to be rendered.
+ * @return {Function} The core reducer function to be used to initialize a Redux store
  */
 "use strict";
 
@@ -8382,16 +8381,14 @@ var fromJS = _immutable.fromJS;
 var Iterable = _immutable.Iterable;
 var Map = _immutable.Map;
 
-function reducer() {
-  var initialUI = arguments[0] === undefined ? {} : arguments[0];
-  var options = arguments[1] === undefined ? {} : arguments[1];
+function reducer(initialUI) {
 
-  var initialState = fromJS({ ui: initialUI }, function (key, value) {
+  var initialState = fromJS(initialUI, function (key, value) {
     var isIndexed = Iterable.isIndexed(value);
     return isIndexed ? value.toList() : value.toOrderedMap();
-  }).merge(options.routes ? fromJS({ routes: options.routes }) : {});
+  });
 
-  return function (_x3, action) {
+  return function (_x, action) {
     var state = arguments[0] === undefined ? initialState : arguments[0];
 
     var nextState = undefined;
@@ -8420,10 +8417,10 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
  *
  * @author Mark Nutter <marknutter@gmail.com>
  *
- * @param {Store} store A redux store
- * @param {Object} ui The Nux vDOM object to be recursively converted into a VirtualNode
+ * @param {Store} store       A redux store
+ * @param {Object} ui         The Nux vDOM object to be recursively converted into a VirtualNode
  * @param {Array} [pathArray] The location of the provided vDOM object within another vDOM object (if applicable)
- * @return {Store} Redux store where app state is maintained.
+ * @return {Store}            Redux store where app state is maintained
  */
 exports.renderUI = renderUI;
 Object.defineProperty(exports, "__esModule", {
@@ -8539,18 +8536,13 @@ function createAction(store, val, event) {
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 /**
- * Returns an array path that can be used to deeply select inside of Nux. 'children' strings
- * will be interleaved between tag strings while all nodes from 'props' and onward will be
- * added in sequence. All returned arrays will include a leading 'ui' node.
+ * Returns an array path from a string selector
  *
  * @example
- * selector('div#foo form#bar input#baz props value');
- * // returns ['div#foo', 'children', 'form#bar', 'children', 'input#baz', 'props', 'value']
+ * selector('div#foo form#bar input#baz');
+ * // returns ['div#foo', 'form#bar', 'input#baz']
  *
- * @author Mark Nutter <marknutter@gmail.com>
- * @summary Generate a Nux reducer function given a custom reducer function.
- *
- * @param {String} selectorString
+ * @param {String} selectorString A space separated series of tag names
  * @return {Array} Path array used to deeply select inside of Immutable Nux vDOM objects
  */
 exports.selector = selector;
