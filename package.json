@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start karma.conf.js",
-    "generate-docs": "./node_modules/.bin/jsdoc ./lib/*.js --destination ./docs/"
+    "generate-docs": "./node_modules/.bin/jsdoc ./src/*.js --destination ./docs/"
   },
   "keywords": [
     "immutable",

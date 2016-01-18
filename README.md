@@ -13,38 +13,23 @@ Nux combines [redux](http://redux.js.org), [virtual-dom](https://github.com/Matt
 ###Example
 
 ```js
-import init from 'nux';
+import {init} from './src/index';
 
-let helloWorld = init(
+// initialize your app with a reducer, the only concern that modifies your app's state
 
-
-// first argument is your reducer - the only concern that modifies your app's state
-(state, action) => {
+let helloWorld = init((state, action) => {
   switch (action.type) {
     case 'SUBMIT_STATEMENT':
-    const inputVal = state.$('div#hw input').props('value');
-    return state.$('div#hw h5 $text'), inputVal)
-                .$('div#hw input').props('value', '');
+    const inputVal = state.$('ui div#hw input').props('value');
+    return state.$('ui div#hw h5 $text', inputVal)
+                .$('ui div#hw input').props('value', '');
   }
   return state;
-},
+});
 
 
-// second argument are any custom action creators you want to specify
-{},
+// pass an initial UI object to the app to start it up
 
-
-// third argument is your options where you can enable action and state logging
-{logActions: true},
-
-
-// fourth argument is the dom element you want your Nux app to render inside of
-document.querySelector('#hello-world-container')
-
-);
-
-
-// call the app function with your initial UI object and let Nux handle it from there
 helloWorld({
   'div#hw': {
     'h5': {
@@ -52,7 +37,7 @@ helloWorld({
     'input': {
       props: {
         placeholder: 'type and hit enter..',
-          events: {
+        events: {
           'ev-keyup-13': {
             dispatch: {
               type: 'SUBMIT_STATEMENT'
@@ -63,4 +48,5 @@ helloWorld({
     }
   }
 });
+
 ```

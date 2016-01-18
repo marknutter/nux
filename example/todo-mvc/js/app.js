@@ -39,7 +39,7 @@ let todoMvc = init((state, action) => {
       return clearCompletedTodos(state);
   }
   return state;
-}, {}, {localStorage: false, logActions: true, routes: routes});
+}, {logActions: true, routes: routes});
 
 todoMvc(todoMvcUi);
 
