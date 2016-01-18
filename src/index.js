@@ -32,7 +32,8 @@ var nux = window.nux = module.exports = {
   init: init,
   options: {
     localStorage: false,
-    logActions: false
+    logActions: false,
+    actionCreators: {}
   },
   utils: utils
 };
@@ -50,15 +51,16 @@ var nux = window.nux = module.exports = {
  * @author Mark Nutter <marknutter@gmail.com>
  * @summary Initialize a Nux application.
  *
- * @param {Function} appReducer The provided reducer function.
- * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
- * @param {Object} [options] Options to configure the nux application.
- * @param {Boolean} [options.localStorage=false] Enable caching of global state to localStorage.
- * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
- * @param {Element} [elem=HTMLBodyElement] The element into which the nux application will be rendered.
- * @return {Store} Redux store where app state is maintained.
+ * @param  {Function} appReducer The provided reducer function.
+ * @param  {Object}   [options]                            Options to configure the nux application.
+ * @param  {Object}   [options.initialUI={div: {}}]        The initial UI vDOM object which will become the first state to be rendered.
+ * @param  {Boolean}  [options.localStorage=false]         Enable caching of global state to localStorage.
+ * @param  {Boolean}  [options.logActions=false]           Enable advanced logging of all actions fired.
+ * @param  {Element}  [options.targetElem=HTMLBodyElement] The element into which the nux application will be rendered.
+ * @param  {Object}   [options.actionCreators={}]          Custom action creators with thunks enabled
+ * @return {Store}    Redux store where app state is maintained.
  */
-function init(appReducer, actionCreators = {}, options = nux.options, elem = document.body) {
+function init(appReducer, options = nux.options) {
 
   return (initialUI = {div: {}}) => {
 
@@ -66,6 +68,8 @@ function init(appReducer, actionCreators = {}, options = nux.options, elem = doc
     if (options.localStorage && localStorage.getItem('nux')) {
       initialState = JSON.parse(localStorage.getItem('nux'));
     };
+
+    options.targetElem = options.targetElem || document.body;
 
     delegator();
 
@@ -87,13 +91,13 @@ function init(appReducer, actionCreators = {}, options = nux.options, elem = doc
     let store = createStoreWithMiddleware(finalReducer);
     let currentUI = store.getState().get('ui').toVNode(store);
     let rootNode = createElement(currentUI);
-    elem.appendChild(rootNode);
+    options.targetElem.appendChild(rootNode);
 
     store.getActionCreator = function(actionName) {
-      if (actionCreators[actionName] === undefined) {
+      if (options.actionCreators[actionName] === undefined) {
         throw new Error(`AtionCreatorNotFoundError: no action creator has been specified for the key ${actionName}`);
       }
-      return actionCreators[actionName];
+      return options.actionCreators[actionName];
     }
 
     if (store.getState().get('routes')) {

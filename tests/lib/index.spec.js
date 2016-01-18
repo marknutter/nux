@@ -35,7 +35,7 @@ describe('the Nux init function', () => {
   it('should allow enabling of caching app state to localStorage', () => {
     localStorage.setItem = jasmine.createSpy('setItem');
     localStorage.getItem = jasmine.createSpy('getItem');
-    var testApp = init(testReducer,{},{localStorage: true})();
+    var testApp = init(testReducer, {localStorage: true})();
     testApp.dispatch({type: 'FOO'});
     expect(localStorage.setItem).toHaveBeenCalledWith('nux', JSON.stringify({div:{}}));
     expect(localStorage.getItem).toHaveBeenCalledWith('nux');
@@ -69,6 +69,19 @@ describe('the Nux init function', () => {
           }
         }
       });
+    });
+  });
+
+  describe("when given custom action creators, ", () => {
+    let testActionCreator, testApp, providedReducer;
+    beforeEach(() => {
+      providedReducer = function(state, action) { return state };
+      testActionCreator = () => {};
+      testApp = init(providedReducer, {actionCreators: {TEST_ACTION_CREATOR: testActionCreator }})()
+    });
+
+    it("should allow access to those action creators", () => {
+      expect(testApp.getActionCreator('TEST_ACTION_CREATOR')).toBe(testActionCreator);
     });
   });
 
