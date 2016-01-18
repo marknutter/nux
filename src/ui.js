@@ -12,10 +12,10 @@ import {fromJS, Map, List, Iterable} from 'immutable';
  *
  * @author Mark Nutter <marknutter@gmail.com>
  *
- * @param {Store} store A redux store
- * @param {Object} ui The Nux vDOM object to be recursively converted into a VirtualNode
+ * @param {Store} store       A redux store
+ * @param {Object} ui         The Nux vDOM object to be recursively converted into a VirtualNode
  * @param {Array} [pathArray] The location of the provided vDOM object within another vDOM object (if applicable)
- * @return {Store} Redux store where app state is maintained.
+ * @return {Store}            Redux store where app state is maintained
  */
 export function renderUI (store, ui, pathArray = List()) {
 

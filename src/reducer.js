@@ -18,18 +18,15 @@ import {fromJS, Iterable, Map} from 'immutable';
  * @author Mark Nutter <marknutter@gmail.com>
  * @summary Generate a Nux reducer function given a custom reducer function.
  *
- * @param {Function} appReducer The provided reducer function.
- * @param {Object} [initialUI] The initial UI vDOM object which will become the first state to be rendered.
- * @param {Object} [options] Options to configure the generated reducer.
- * @param {Boolean} [options.logActions=false] Enable advanced logging of all actions fired.
- * @return {Function} Reducer function to be used to initialize a Redux store
+ * @param {Object}    [initialUI] The initial UI vDOM object which will become the first state to be rendered.
+ * @return {Function} The core reducer function to be used to initialize a Redux store
  */
-export function reducer(initialUI = {}, options = {}) {
+export function reducer(initialUI) {
 
-  const initialState = fromJS({ui: initialUI}, function (key, value) {
+  const initialState = fromJS(initialUI, function (key, value) {
     var isIndexed = Iterable.isIndexed(value);
     return isIndexed ? value.toList() : value.toOrderedMap();
-  }).merge(options.routes ? fromJS({routes: options.routes}) : {});
+  });
 
   return function(state = initialState, action) {
     let nextState;

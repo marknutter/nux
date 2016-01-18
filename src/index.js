@@ -53,7 +53,7 @@ var nux = window.nux = module.exports = {
  *
  * @param  {Function} appReducer The provided reducer function.
  * @param  {Object}   [options]                            Options to configure the nux application.
- * @param  {Object}   [options.initialUI={div: {}}]        The initial UI vDOM object which will become the first state to be rendered.
+ * @param  {Object}   [options.initialUI={ui: {}}]         The initial UI vDOM object which will become the first state to be rendered.
  * @param  {Boolean}  [options.localStorage=false]         Enable caching of global state to localStorage.
  * @param  {Boolean}  [options.logActions=false]           Enable advanced logging of all actions fired.
  * @param  {Element}  [options.targetElem=HTMLBodyElement] The element into which the nux application will be rendered.
@@ -62,7 +62,7 @@ var nux = window.nux = module.exports = {
  */
 function init(appReducer, options = nux.options) {
 
-  return (initialUI = {div: {}}) => {
+  return (initialUI = {ui: {}}) => {
 
     let initialState = initialUI;
     if (options.localStorage && localStorage.getItem('nux')) {
