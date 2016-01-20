@@ -13,6 +13,12 @@
  * @property {Function} replaceReducer Replace an existing reducer with a new one.
  */
 
+/**
+ * An initialized nux application.
+ * @typedef {Function} A function that accepts an initial UI object and starts a nux app running
+ * @param {object} [initialUI={ui: { div: {}}}] an initial UI object for the nux app to render from
+ */
+
 import h from 'virtual-dom/h';
 import diff from 'virtual-dom/diff';
 import patch from 'virtual-dom/patch';
@@ -53,12 +59,11 @@ var nux = window.nux = module.exports = {
  *
  * @param  {Function} appReducer The provided reducer function.
  * @param  {Object}   [options]                             Options to configure the nux application.
- * @param  {Object}   [options.initialUI={ui:{div:{}}}]     The initial UI vDOM object which will become the first state to be rendered.
- * @param  {String}  [options.localStorage=false]           Enable caching of global state to localStorage under the provided key
+ * @param  {String}   [options.localStorage=false]          Enable caching of global state to localStorage under the provided key
  * @param  {Boolean}  [options.logActions=false]            Enable advanced logging of all actions fired.
  * @param  {Element}  [options.targetElem=HTMLBodyElement]  The element into which the nux application will be rendered.
  * @param  {Object}   [options.actionCreators={}]           Custom action creators with thunks enabled
- * @return {Store}    Redux store where app state is maintained.
+ * @return {Function}                                       Initialized nux app ready to accept an initial UI object and begin running
  */
 function init(appReducer, options = nux.options) {
 
@@ -71,7 +76,9 @@ function init(appReducer, options = nux.options) {
 
     options.targetElem = options.targetElem || document.body;
 
-    delegator();
+    let del = delegator();
+    del.listenTo('mouseover');
+    del.listenTo('mouseout');
 
     let router = Rlite();
     let middleWare = [thunkMiddleware];
