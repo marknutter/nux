@@ -4,3 +4,4 @@ bower_components
 *.orig
 docs
 .DS_Store
+npm-debug.log
