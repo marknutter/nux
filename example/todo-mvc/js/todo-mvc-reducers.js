@@ -90,8 +90,6 @@ export function toggleAllTodos(state) {
 }
 
 export function showTodos(state, view) {
-  const filtersPath = 'ui div#todoapp section.todoapp footer.footer ul.filters';
-  window.location = `#/${view}`;
   const todos = state.$(todoListPath).children().map((val, key) => {
     const todo = val.toNode(key);
     const checked = todo.$(`${key} div.view input.toggle`).props('checked');
@@ -101,11 +99,7 @@ export function showTodos(state, view) {
       return todo.style('display', null).get(key);
     }
   });
-  const filters = state.$(filtersPath).children().map((val, key) => {
-    const filter = val.toNode(key);
-    return filter.$(`${key} a`).props('className', key.indexOf(view) !== -1 ? 'selected' : '').get(key);
-  });
-  return state.$(todoListPath).children(todos).$(filtersPath).children(filters);
+  return state.$(todoListPath).children(todos);
 }
 
 export function clearCompletedTodos(state) {
@@ -113,16 +107,7 @@ export function clearCompletedTodos(state) {
   return setItemsLeft(state.$(todoListPath).children(activeTodos));
 }
 
-function setItemsLeft(state) {
-  const toggleAllPath = 'ui div#todoapp section.todoapp section.main input.toggle-all';
-  const todoCountPath = 'ui div#todoapp section.todoapp footer.footer span.todo-count';
-  const activeCount = getTodos(state, 'active').size;
-  return  state.$(`${todoCountPath} strong`).children('$text', activeCount)
-               .$(`${todoCountPath} span`).children('$text', activeCount === 0 ? ' item left' : ' items left')
-               .$(toggleAllPath).props('checked', activeCount === 0 ? 'checked' : null)
-               .$(`${mainPath}`).style('display', getTodos(state).size > 0 ? null : 'none')
-               .$(`${footerPath}`).style('display', getTodos(state).size > 0 ? null : 'none');
-}
+
 
 function getTodos(state, view = 'all') {
   return state.$(todoListPath).children()

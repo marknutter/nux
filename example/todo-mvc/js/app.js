@@ -3,7 +3,31 @@ import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
 
-let todoMvc = init((state, action) => {
+let todoMvc = init((state = todoMvcUi, action) => {
+  const todoapp = state.getIn(['ui','div#todoapp','section.todoapp']);
+  return {
+    ui: {
+      'div#todoapp': {
+        'section.todoapp': {
+          'header.header': header(todoapp.getIn('header.header'), action),
+          'section.main': mainSection(todoapp.getIn('section.main'), action),
+          'footer.footer': footer(todoapp.getIn('footer.footer'), action)
+        },
+        'footer.info': {
+          props: {
+            style: {
+              display: 'none'
+            }
+          },
+          'p': {
+            '$text': 'Double-click to edit a todo'
+          }
+        }
+      }
+    }
+  };
+
+
   switch (action.type) {
     case 'ADD_TODO':
       return addTodo(state, action.event);
@@ -27,5 +51,7 @@ let todoMvc = init((state, action) => {
   return state;
 }, {logActions: true, localStorage: 'nuxTodoMVC'});
 
-todoMvc(todoMvcUi);
+let store = todoMvc(todoMvcUi);
 
+
+store.subscribe()
