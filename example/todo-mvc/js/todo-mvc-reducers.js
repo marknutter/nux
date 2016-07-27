@@ -53,6 +53,14 @@ export function showEditTodo(state, tag) {
               .$(todoPath).props('className', state.$(todoPath).props('className') + ' editing');
 }
 
+export function getTodos(state, view = 'all') {
+  return state.$(todoListPath).children()
+              .filter((val, key) => {
+                const todo = val.toNode(key);
+                const checked = todo.children().$('div.view input.toggle').props('checked');
+                return checked === undefined && view === 'active' || checked && view === 'completed' ||view === 'all';
+              });
+}
 
 
 export function editTodo(state, tag) {
@@ -109,11 +117,4 @@ export function clearCompletedTodos(state) {
 
 
 
-function getTodos(state, view = 'all') {
-  return state.$(todoListPath).children()
-              .filter((val, key) => {
-                const todo = val.toNode(key);
-                const checked = todo.children().$('div.view input.toggle').props('checked');
-                return checked === undefined && view === 'active' || checked && view === 'completed' ||view === 'all';
-              });
-}
+

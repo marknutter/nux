@@ -1,4 +1,6 @@
-import {addTodo, toggleTodo, toggleAllTodos, showTodos, clearCompletedTodos, deleteTodo, showEditTodo, editTodo, cancelEditTodo} from './todo-mvc-reducers';
+import header from './components/header';
+import mainSection from './components/main-section';
+import footer from './components/footer';
 import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 

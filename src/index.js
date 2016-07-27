@@ -33,6 +33,7 @@ import {reducer} from './reducer';
 import {fromJS, Map, Iterable} from 'immutable';
 import Rlite from 'rlite-router';
 import reduceReducers from 'reduce-reducers';
+import {combineReducers} from 'redux-immutable';
 
 var nux = window.nux = module.exports = {
   init: init,
