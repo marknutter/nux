@@ -1,6 +1,8 @@
 import {todoComponent} from './todo-mvc-todo-component';
+import {fromJS, Map, List, Iterable} from 'immutable';
+import todoList from './todo-list'
 
-export const mainSectionComponent = {
+const mainSectionComponent = {
   props: {
     style: {
       display: 'none'
@@ -24,32 +26,23 @@ export const mainSectionComponent = {
     },
     '$text': 'Mark all as complete'
   },
-  'ui.todo-list': {
+  'ui.todo-list': todoList
+}
 
+
+export default mainSection(state = mainSectionComponent, action) {
+  switch (action.type) {
+    case 'ADD_TODO': 
+      return addTodo(state, action.title);
+    case 'SET_TODO_LIST_VISIBILITY':
+      return setTodoListVisibility(state, action.todoCount);
+    default:
+      return state;
   }
 }
 
 
 
-
-export function addTodo(state, title) {
-  if (title) {
-    const todos = state.get('ui.todo-list') //state.getIn(selector(todoListPath + ' children'));
-
-    const tag = `li#todo-${todos.size}`;
-    const newTodo = todoComponent(title.trim(), tag);
-    const newTodos = todos.set(tag, newTodo);
-    const sortedTodos = newTodos.sortBy((val, key) => {
-                          return parseInt(key.split("#todo-")[1]);
-                        }, (keyA, keyB) => {
-                          return keyA < keyB ? 1 : -1;
-                        });
-    return state.style('display', null);
-  } else {
-    state.$(todoInputPath).props('value', '');
-  }
-  return state;
-}
 
 
 function setTodoListVisibility(state, todoCount) {

@@ -5,14 +5,11 @@ import {init} from './../../../src/index';
 import {todoMvcUi} from './todo-mvc-ui'
 
 
-let todoMvc = init((state = todoMvcUi, action) => {
-  const todoapp = state.getIn(['ui','div#todoapp','section.todoapp']);
-  return state.setIn(['ui', 'div#todoapp', 'section.todoapp'], Map({
-    'header.header': header(todoapp.getIn('header.header'), action))
-    'section.main': mainSection(todoapp.getIn('section.main'), action),
-    'footer.footer': footer(todoapp.getIn('footer.footer'), action)
-  });
-}, {logActions: true, localStorage: 'nuxTodoMVC'});
+let todoMvc = init(combineReducers({
+    'header.header': header
+    'section.main': mainSection,
+    'footer.footer': footer
+  }), {logActions: true, localStorage: 'nuxTodoMVC'});
 
 let store = todoMvc(todoMvcUi);
 
